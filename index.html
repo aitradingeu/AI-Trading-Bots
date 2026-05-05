@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CriptoBot Enterprise | Elite AI Ecosystem</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <style>
+        /* ==========================================================================
+           1. CSS VARIABLES & THEME
+           ========================================================================== */
+        :root {
+            --gold: #d4af37;
+            --gold-bright: #ffdf00;
+            --navy-deep: #000b18;
+            --bg-main: #001224;
+            --glass: rgba(0, 31, 63, 0.7);
+            --text: #ffffff;
+            --text-dim: #8da3b8;
+            --success: #00ff88;
+            --danger: #ff3b30;
+            --border: rgba(212, 175, 55, 0.25);
+            --radius-lg: 24px;
+            --radius-xl: 32px;
+            --shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at top, #001a33 0%, #000b18 100%);
+            color: var(--text);
+            overflow-x: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        .hidden { display: none !important; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
+
+        /* ==========================================================================
+           2. AUTHENTICATION (LOGIN / REGISTER)
+           ========================================================================== */
+        #auth-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: var(--bg-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .auth-card {
+            width: 100%;
+            max-width: 440px;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 40px 30px;
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.2);
+        }
+
+        .auth-tabs {
+            display: flex;
+            background: rgba(0,0,0,0.3);
+            border-radius: 100px;
+            padding: 5px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border);
+        }
+
+        .auth-tab-btn {
+            flex: 1;
+            padding: 12px;
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            font-weight: 800;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 12px;
+            border-radius: 100px;
+            transition: 0.3s;
+        }
+
+        .auth-tab-btn.active { background: var(--gold); color: #000; }
+
+        .input-group { margin-bottom: 20px; position: relative; }
+        .input-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: 900;
+            color: var(--gold);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .custom-input {
+            width: 100%;
+            padding: 16px;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 14px;
+            color: #fff;
+            font-size: 15px;
+            outline: none;
+        }
+
+        .custom-input:focus { border-color: var(--gold); }
+
+        .eye-btn {
+            position: absolute;
+            right: 15px;
+            top: 38px;
+            cursor: pointer;
+            color: var(--gold);
+            font-size: 18px;
+        }
+
+        .pass-hint {
+            font-size: 10px;
+            color: var(--text-dim);
+            margin-top: 5px;
+            line-height: 1.4;
+        }
+
+        .btn-gold {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(45deg, var(--gold), var(--gold-bright));
+            color: #000;
+            border: none;
+            border-radius: 100px;
+            font-weight: 900;
+            text-transform: uppercase;
+            cursor: pointer;
+            margin-top: 10px;
+            box-shadow: 0 5px 15px rgba(212,175,55,0.3);
+        }
+
+        /* ==========================================================================
+           3. MAIN DASHBOARD STYLES
+           ========================================================================== */
+        #main-app {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .app-header {
+            padding: 30px 20px 15px;
+            background: rgba(0, 11, 24, 0.8);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .balance-widget {
+            margin: 20px;
+            padding: 35px 25px;
+            background: linear-gradient(135deg, rgba(0,31,63,1), rgba(0,11,24,1));
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--border);
+            text-align: center;
+            position: relative;
+        }
+
+        .balance-amount { font-size: 44px; font-weight: 900; margin: 10px 0; letter-spacing: -1px; }
+        .demo-tag {
+            position: absolute;
+            top: 15px; right: 20px;
+            background: #FF9F0A; color: #000;
+            padding: 2px 8px; border-radius: 4px;
+            font-size: 10px; font-weight: 900; text-transform: uppercase;
+        }
+
+        /* Tabs Content */
+        .viewport { flex: 1; overflow-y: auto; padding: 0 20px 100px; }
+        .tab-pane { display: none; animation: fadeIn 0.4s; }
+        .tab-pane.active { display: block; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .card {
+            background: var(--glass);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+        }
+
+        /* --- FAKE BLOCKCHAIN FEED --- */
+        #blockchain-feed {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--text-dim);
+            height: 350px;
+            overflow: hidden;
+            line-height: 2;
+        }
+        .feed-row { border-bottom: 1px solid rgba(255,255,255,0.03); padding: 5px 0; }
+        .feed-user { color: var(--gold); font-weight: 700; }
+        .feed-buy { color: var(--success); }
+
+        /* --- BOTTOM NAV (FACEBOOK STYLE) --- */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            height: 80px;
+            background: rgba(0, 11, 24, 0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            padding-bottom: env(safe-area-inset-bottom);
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            color: var(--text-dim); cursor: pointer;
+            width: 25%; transition: 0.3s;
+        }
+
+        .nav-item svg { width: 24px; height: 24px; margin-bottom: 5px; fill: currentColor; }
+        .nav-item.active { color: var(--gold); }
+
+        /* Asset Items */
+        .asset-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px; background: rgba(0,0,0,0.3);
+            border-radius: 16px; margin-bottom: 10px; cursor: pointer;
+        }
+        .asset-logo { width: 35px; height: 35px; border-radius: 50%; margin-right: 12px; }
+
+        /* Profile & Buttons */
+        .avatar {
+            width: 80px; height: 80px;
+            background: var(--gold); border-radius: 50%;
+            margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;
+            font-size: 30px; font-weight: 900; color: #000;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="auth-screen">
+        <div class="auth-card">
+            <div class="auth-tabs">
+                <button class="auth-tab-btn active" id="tab-login" onclick="switchAuth('login')">Log In</button>
+                <button class="auth-tab-btn" id="tab-create" onclick="switchAuth('create')">Create Account</button>
+            </div>
+
+            <div id="form-login">
+                <div class="input-group">
+                    <label>Email Address</label>
+                    <input type="email" id="login-email" class="custom-input" placeholder="name@example.com">
+                </div>
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" id="login-pass" class="custom-input" placeholder="••••••••">
+                    <span class="eye-btn" onclick="togglePass('login-pass')">👁️</span>
+                </div>
+                <button class="btn-gold" onclick="handleLogin()">Access Terminal</button>
+            </div>
+
+            <div id="form-create" class="hidden">
+                <div class="input-group">
+                    <label>Full Name</label>
+                    <input type="text" id="reg-name" class="custom-input" placeholder="John Doe">
+                </div>
+                <div class="input-group">
+                    <label>Email Address</label>
+                    <input type="email" id="reg-email" class="custom-input" placeholder="name@email.com">
+                </div>
+                <div class="input-group">
+                    <label>Phone Number</label>
+                    <input type="tel" id="reg-phone" class="custom-input">
+                </div>
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" id="reg-pass" class="custom-input" placeholder="••••••••">
+                    <span class="eye-btn" onclick="togglePass('reg-pass')">👁️</span>
+                    <p class="pass-hint">Min 6 chars, 1 uppercase, 1 lowercase, 1 number.</p>
+                </div>
+                <button class="btn-gold" onclick="handleRegister()">Establish Account</button>
+            </div>
+
+            <p id="auth-error" style="color:var(--danger); font-size:12px; margin-top:15px; text-align:center; font-weight:700;"></p>
+        </div>
+    </div>
+
+    <div id="main-app" class="hidden">
+        <header class="app-header">
+            <div style="font-weight:900; color:var(--gold); font-size:20px;">CRIPTBOT PRO</div>
+            <div style="font-size:10px; color:var(--success); font-weight:800;">● SYSTEM LIVE</div>
+        </header>
+
+        <div class="balance-widget">
+            <div id="demo-tag" class="demo-tag hidden">Demo Mode</div>
+            <div style="font-size:12px; color:var(--gold); font-weight:800; letter-spacing:1px;">TOTAL EQUITY</div>
+            <div class="balance-amount" id="ui-balance">0.00 €</div>
+            <div style="color:var(--success); font-weight:700; font-size:14px;" id="ui-profit">+ 0.00 € Today</div>
+        </div>
+
+        <div class="viewport">
+            <div id="tab-market" class="tab-pane active">
+                <div id="crypto-list-container"></div>
+            </div>
+
+            <div id="tab-network" class="tab-pane">
+                <div class="card">
+                    <div style="font-weight:900; color:var(--gold); font-size:12px; margin-bottom:15px; text-transform:uppercase;">Live Blockchain Ledger</div>
+                    <div id="blockchain-feed"></div>
+                </div>
+            </div>
+
+            <div id="tab-wallet" class="tab-pane">
+                <div class="card" style="text-align:center;">
+                    <h3 style="color:var(--gold); margin-bottom:15px;">DEPOSIT USDT</h3>
+                    <div id="qrcode" style="background:#fff; padding:10px; display:inline-block; border-radius:12px; margin-bottom:15px;"></div>
+                    <div style="font-family:monospace; font-size:11px; background:rgba(0,0,0,0.5); padding:12px; border-radius:8px; border:1px dashed var(--gold); word-break:break-all;">0x412De5B79a293BD9b69338f938f578215AD88dDc</div>
+                </div>
+            </div>
+
+            <div id="tab-profile" class="tab-pane">
+                <div class="card" style="text-align:center;">
+                    <div class="avatar" id="ui-avatar">U</div>
+                    <h2 id="ui-name">User Name</h2>
+                    <p id="ui-email" style="color:var(--text-dim); margin-bottom:25px;"></p>
+                    
+                    <button id="btn-demo" class="btn-gold" style="background:#FF9F0A; margin-bottom:15px;" onclick="toggleDemo()">Activate Demo Version</button>
+                    <button class="btn-gold" style="background:transparent; border:1px solid var(--danger); color:var(--danger);" onclick="location.reload()">Logout</button>
+                </div>
+            </div>
+        </div>
+
+        <nav class="bottom-nav">
+            <div class="nav-item active" onclick="switchTab('market', this)">
+                <svg viewBox="0 0 24 24"><path d="M3 3v18h18M7 14l4-4 4 4 5-5"/></svg>
+                <span>Markets</span>
+            </div>
+            <div id="nav-network" class="nav-item" onclick="switchTab('network', this)">
+                <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                <span>Network</span>
+            </div>
+            <div id="nav-wallet" class="nav-item" onclick="switchTab('wallet', this)">
+                <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M16 10h4"/></svg>
+                <span>Wallet</span>
+            </div>
+            <div class="nav-item" onclick="switchTab('profile', this)">
+                <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <span>Profile</span>
+            </div>
+        </nav>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+        import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDnQYyX9k0NWKjWyo8fSGWFTUAN_XRfrbU",
+            authDomain: "ai-trading-bots-5491a.firebaseapp.com",
+            projectId: "ai-trading-bots-5491a",
+            databaseURL: "https://ai-trading-bots-5491a-default-rtdb.firebaseio.com",
+            storageBucket: "ai-trading-bots-5491a.appspot.com",
+            messagingSenderId: "904660144418",
+            appId: "1:904660144418:web:5d16771e00c7c3f8d7157b"
+        };
+
+        const fbApp = initializeApp(firebaseConfig);
+        const db = getDatabase(fbApp);
+
+        let state = {
+            user: null,
+            isDemo: false,
+            realBal: 120.50,
+            demoBal: 1000.00,
+            phoneUtil: null
+        };
+
+        // --- AUTH LOGIC ---
+        window.switchAuth = (mode) => {
+            document.getElementById('tab-login').classList.toggle('active', mode === 'login');
+            document.getElementById('tab-create').classList.toggle('active', mode === 'create');
+            document.getElementById('form-login').classList.toggle('hidden', mode === 'create');
+            document.getElementById('form-create').classList.toggle('hidden', mode === 'login');
+        };
+
+        window.togglePass = (id) => {
+            const el = document.getElementById(id);
+            el.type = el.type === 'password' ? 'text' : 'password';
+        };
+
+        state.phoneUtil = window.intlTelInput(document.querySelector("#reg-phone"), {
+            preferredCountries: ["gb", "de", "bg", "us"], separateDialCode: true
+        });
+
+        const validatePassword = (p) => {
+            return p.length >= 6 && /[a-z]/.test(p) && /[A-Z]/.test(p) && /\d/.test(p);
+        };
+
+        window.handleRegister = async () => {
+            const name = document.getElementById('reg-name').value;
+            const email = document.getElementById('reg-email').value.toLowerCase().trim();
+            const pass = document.getElementById('reg-pass').value;
+            const phone = state.phoneUtil.getNumber();
+            const err = document.getElementById('auth-error');
+
+            if(name.length < 3 || !email.includes('@')) {
+                err.innerText = "Please fill all fields correctly."; return;
+            }
+            if(!validatePassword(pass)) {
+                err.innerText = "Password does not meet security requirements."; return;
+            }
+
+            const uid = "user_" + Math.floor(Math.random() * 899999 + 100000);
+            await set(ref(db, `users/${uid}`), { name, email, phone, password: pass, balance: 120.50 });
+            completeLogin(uid, { name, email, balance: 120.50 });
+        };
+
+        window.handleLogin = async () => {
+            const email = document.getElementById('login-email').value.toLowerCase().trim();
+            const pass = document.getElementById('login-pass').value;
+            const err = document.getElementById('auth-error');
+
+            const snap = await get(ref(db, 'users'));
+            if(snap.exists()) {
+                for(let id in snap.val()) {
+                    let u = snap.val()[id];
+                    if(u.email === email && u.password === pass) {
+                        completeLogin(id, u); return;
+                    }
+                }
+            }
+            err.innerText = "Invalid Master Credentials.";
+        };
+
+        function completeLogin(uid, data) {
+            state.user = { uid, ...data };
+            state.realBal = data.balance || 120.50;
+            document.getElementById('auth-screen').classList.add('hidden');
+            document.getElementById('main-app').classList.remove('hidden');
+            document.getElementById('ui-name').innerText = data.name.toUpperCase();
+            document.getElementById('ui-email').innerText = data.email;
+            document.getElementById('ui-avatar').innerText = data.name[0].toUpperCase();
+            startApp();
+        }
+
+        // --- CORE APP ---
+        function startApp() {
+            fetchMarkets();
+            startBlockchain();
+            setInterval(profitLoop, 35000);
+            new QRCode(document.getElementById("qrcode"), "0x412De5B79a293BD9b69338f938f578215AD88dDc");
+        }
+
+        window.switchTab = (id, btn) => {
+            if(state.isDemo && (id === 'wallet' || id === 'network')) return;
+            document.querySelectorAll('.tab-pane').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById('tab-' + id).classList.add('active');
+            btn.classList.add('active');
+        };
+
+        window.toggleDemo = () => {
+            state.isDemo = !state.isDemo;
+            const btn = document.getElementById('btn-demo');
+            const navN = document.getElementById('nav-network');
+            const navW = document.getElementById('nav-wallet');
+            const tag = document.getElementById('demo-tag');
+
+            if(state.isDemo) {
+                btn.innerText = "Restore Real Version";
+                navN.style.opacity = "0.2"; navW.style.opacity = "0.2";
+                tag.classList.remove('hidden');
+                switchTab('market', document.querySelector('.nav-item'));
+            } else {
+                btn.innerText = "Activate Demo Version";
+                navN.style.opacity = "1"; navW.style.opacity = "1";
+                tag.classList.add('hidden');
+            }
+            updateUI();
+        }
+
+        function updateUI() {
+            const bal = state.isDemo ? state.demoBal : state.realBal;
+            const profit = isDemo ? (state.demoBal - 1000) : (state.realBal - 120.50);
+            document.getElementById('ui-balance').innerText = bal.toFixed(2) + " €";
+            document.getElementById('ui-profit').innerText = `+ ${Math.max(0, profit).toFixed(2)} € Today`;
+        }
+
+        function profitLoop() {
+            if(state.isDemo) {
+                state.demoBal += 0.08;
+            } else {
+                state.realBal += 0.10;
+                set(ref(db, `users/${state.user.uid}/balance`), state.realBal);
+            }
+            updateUI();
+        }
+
+        function startBlockchain() {
+            const feed = document.getElementById('blockchain-feed');
+            const names = ["Alex", "Thomas", "Ivan", "Sofia", "Marco", "Elena", "Chris"];
+            const coins = ["BTC", "ETH", "USDT", "SOL", "BNB"];
+            setInterval(() => {
+                const name = names[Math.floor(Math.random()*names.length)];
+                const coin = coins[Math.floor(Math.random()*coins.length)];
+                const amt = (Math.random() * 2).toFixed(2);
+                const row = document.createElement('div');
+                row.className = 'feed-row';
+                row.innerHTML = `[${new Date().toLocaleTimeString()}] <span class="feed-user">${name}</span> executed <span class="feed-buy">BUY</span> on ${coin} ... <span class="feed-buy">+${amt} €</span>`;
+                feed.prepend(row);
+                if(feed.children.length > 25) feed.removeChild(feed.lastChild);
+            }, 3000);
+        }
+
+        async function fetchMarkets() {
+            try {
+                const res = await fetch('https://api.coincap.io/v2/assets?limit=50');
+                const json = await res.json();
+                const container = document.getElementById('crypto-list-container');
+                container.innerHTML = '';
+                json.data.forEach(c => {
+                    const price = parseFloat(c.priceUsd);
+                    const change = parseFloat(c.changePercent24Hr);
+                    container.innerHTML += `
+                        <div class="asset-row">
+                            <div style="display:flex; align-items:center;">
+                                <img src="https://assets.coincap.io/assets/icons/${c.symbol.toLowerCase()}@2x.png" class="asset-logo">
+                                <div><div style="font-weight:800;">${c.symbol}</div><div style="font-size:10px; color:var(--text-dim);">${c.name}</div></div>
+                            </div>
+                            <div style="text-align:right;">
+                                <div style="font-weight:700;">$${price.toLocaleString(undefined, {minimumFractionDigits:2})}</div>
+                                <div style="font-size:11px; color:${change >= 0 ? 'var(--success)' : 'var(--danger)'}">${change.toFixed(2)}%</div>
+                            </div>
+                        </div>`;
+                });
+            } catch(e) {}
+        }
+    </script>
+</body>
+</html>
