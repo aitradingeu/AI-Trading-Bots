@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CriptoBot Enterprise | Advanced AI Ecosystem</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --brand-primary: #d4af37; 
+            --brand-primary-hover: #ffdf00;
+            --brand-dark: #000b18;
+            --bg-main: #001224; 
+            --bg-card: rgba(0, 31, 63, 0.7); 
+            --text-main: #ffffff;
+            --text-muted: #8da3b8;
+            --success: #00ff88;
+            --danger: #ff3b30;
+            --warning: #ffcc00;
+            --border-light: rgba(212, 175, 55, 0.2); 
+            --shadow-sm: 0 4px 15px rgba(0,0,0,0.3);
+            --shadow-md: 0 8px 30px rgba(0, 11, 24, 0.8);
+            --shadow-lg: 0 0 20px rgba(212, 175, 55, 0.2);
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --radius-xl: 32px;
+            --transition-fast: 0.2s ease;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at top, #001a33 0%, #000b18 100%);
+            color: var(--text-main);
+            -webkit-tap-highlight-color: transparent;
+            line-height: 1.5;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--brand-primary); border-radius: 10px; }
+
+        .hidden { display: none !important; }
+        .text-center { text-align: center; }
+        
+        /* Ticker Tape */
+        .ticker-wrap { width: 100%; background: #000; border-bottom: 1px solid var(--brand-primary); padding: 8px 0; overflow: hidden; position: sticky; top: 0; z-index: 1001; }
+        .ticker { display: flex; white-space: nowrap; animation: ticker 30s linear infinite; font-size: 13px; font-weight: 700; color: var(--text-main); }
+        @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+
+        /* Blockchain Ledger Style */
+        #blockchain-ledger {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            padding: 12px;
+            margin-bottom: 25px;
+            height: 100px;
+            overflow: hidden;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            color: var(--brand-primary);
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
+        .ledger-line { margin-bottom: 4px; border-bottom: 1px solid rgba(212,175,55,0.05); padding-bottom: 2px; animation: fadeIn 0.3s ease; }
+
+        /* Auth */
+        #auth-view { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
+        .auth-container { width: 100%; max-width: 420px; background: var(--bg-card); backdrop-filter: blur(10px); padding: 40px 20px; border-radius: var(--radius-xl); border: 1px solid var(--border-light); box-shadow: var(--shadow-lg); }
+        .auth-header { text-align: center; margin-bottom: 20px; }
+        .auth-header h1 { font-size: 32px; font-weight: 900; color: var(--brand-primary); letter-spacing: -1px; }
+        
+        .input-group { margin-bottom: 18px; }
+        .input-group label { display: block; font-size: 11px; font-weight: 800; color: var(--brand-primary); margin-bottom: 6px; text-transform: uppercase; }
+        .custom-input { width: 100%; padding: 14px 18px; border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-md); font-size: 15px; background: rgba(0,0,0,0.4); color: #fff; transition: var(--transition-fast); }
+        .custom-input:focus { outline: none; border-color: var(--brand-primary); }
+        
+        .btn-main { width: 100%; padding: 16px; background: linear-gradient(45deg, #d4af37, #ffdf00); color: #000; border: none; border-radius: 100px; font-size: 16px; font-weight: 800; text-transform: uppercase; cursor: pointer; transition: var(--transition-fast); }
+
+        /* App Layout */
+        .app-header { background: var(--bg-card); backdrop-filter: blur(10px); padding: 16px 24px; border-bottom: 1px solid var(--border-light); position: sticky; top: 34px; z-index: 100; display: flex; justify-content: space-between; align-items: center; }
+        .app-header-title { font-weight: 800; font-size: 20px; color: var(--brand-primary); }
+        
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 75px; background: #000b18; border-top: 1px solid var(--border-light); display: flex; justify-content: space-around; align-items: center; z-index: 1000; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--text-muted); cursor: pointer; width: 20%; }
+        .nav-item svg { width: 22px; height: 22px; margin-bottom: 4px; fill: currentColor; }
+        .nav-item span { font-size: 9px; font-weight: 700; text-transform: uppercase; }
+        .nav-item.active { color: var(--brand-primary); }
+
+        .tab-content { display: none; padding: 20px; max-width: 600px; margin: 0 auto; animation: slideUp 0.4s; }
+        .tab-content.active { display: block; }
+
+        /* Widgets */
+        .balance-widget { background: linear-gradient(135deg, rgba(0,31,63,0.9), rgba(0,11,24,0.9)); border-radius: var(--radius-xl); padding: 30px 20px; text-align: center; border: 1px solid var(--border-light); margin-bottom: 24px; }
+        .balance-label { color: var(--brand-primary); font-size: 13px; font-weight: 800; text-transform: uppercase; }
+        .balance-amount { font-size: 42px; font-weight: 900; color: #fff; margin: 10px 0; }
+        
+        .card { background: var(--bg-card); backdrop-filter: blur(10px); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 20px; border: 1px solid var(--border-light); }
+        .card-title { font-size: 15px; font-weight: 800; margin-bottom: 15px; color: var(--brand-primary); text-transform: uppercase; }
+
+        .btn-action { width: 100%; padding: 14px; border-radius: var(--radius-md); border: none; font-size: 14px; font-weight: 800; cursor: pointer; text-transform: uppercase; }
+        .btn-primary-action { background: var(--brand-primary); color: #000; }
+        .btn-demo-mode { background: rgba(0, 255, 136, 0.1); color: #00ff88; border: 1px solid #00ff88; margin-top: 15px; }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .profile-avatar { width: 80px; height: 80px; background: linear-gradient(45deg, var(--brand-primary), #ffdf00); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: 900; color: #000; margin: 0 auto 15px auto; }
+        .vip-badge { display: inline-block; padding: 5px 15px; border-radius: 20px; font-size: 12px; font-weight: 800; margin-bottom: 20px; }
+        .vip-basic { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.3); }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.8); z-index: 2000; display: flex; align-items: flex-end; justify-content: center; opacity: 0; visibility: hidden; transition: 0.3s; }
+        .modal-overlay.open { opacity: 1; visibility: visible; }
+        .modal-content { background: var(--bg-main); width: 100%; max-width: 600px; border-radius: var(--radius-xl) var(--radius-xl) 0 0; padding: 32px 24px; border-top: 2px solid var(--brand-primary); transform: translateY(100%); transition: 0.3s; }
+        .modal-overlay.open .modal-content { transform: translateY(0); }
+
+        #toast-container { position: fixed; top: 60px; left: 50%; transform: translateX(-50%); z-index: 9999; width: 90%; max-width: 400px; }
+        .toast { background: #000; color: #fff; padding: 14px 20px; border: 1px solid var(--brand-primary); border-radius: var(--radius-md); font-size: 14px; margin-bottom: 10px; animation: fadeIn 0.3s; }
+    </style>
+</head>
+<body>
+
+    <div class="ticker-wrap">
+        <div class="ticker" id="top-ticker">
+            <span style="margin-right: 40px;">BTC/EUR: €94,120.45 <span style="color:#00ff88;">▲ 2.4%</span></span>
+            <span style="margin-right: 40px;">ETH/EUR: €3,120.12 <span style="color:#00ff88;">▲ 1.8%</span></span>
+            <span style="margin-right: 40px;">LGBTC/EUR: €1.42 <span style="color:#00ff88;">▲ 12.5%</span></span>
+        </div>
+    </div>
+
+    <!-- LOGIN VIEW -->
+    <div id="auth-view">
+        <div class="auth-container">
+            <div class="auth-header">
+                <svg width="50" height="50" viewBox="0 0 24 24" fill="none" style="margin-bottom: 10px;">
+                    <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="var(--brand-primary)"/>
+                    <path d="M2 17L12 22L22 17M2 12L12 17L22 12" stroke="var(--brand-primary)" stroke-width="2"/>
+                </svg>
+                <h1>CriptoBot</h1>
+                <p style="color: var(--brand-primary); font-weight: 600; font-size: 12px;">ADVANCED AI ECOSYSTEM</p>
+            </div>
+
+            <!-- FAKE BLOCKCHAIN LEDGER -->
+            <div id="blockchain-ledger">
+                <div id="ledger-content"></div>
+            </div>
+
+            <form id="login-form">
+                <div class="input-group">
+                    <label>Email Address</label>
+                    <input type="email" id="auth-email" class="custom-input" placeholder="name@example.com" required>
+                </div>
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" id="auth-password" class="custom-input" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn-main" id="btn-login">Access AI Portfolio</button>
+            </form>
+            <div class="text-center" style="margin-top: 20px; font-size: 10px; color: #555;">
+                SECURED BY QUANTUM-SHIELD® PROTOCOL
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP VIEW -->
+    <div id="app-view" class="hidden">
+        <header class="app-header">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7L12 12L22 7L12 2Z" fill="var(--brand-primary)"/></svg>
+                <div class="app-header-title" id="header-title-text">Dashboard</div>
+            </div>
+            <span id="demo-indicator" class="hidden" style="color: #00ff88; font-size: 10px; border: 1px solid #00ff88; padding: 2px 8px; border-radius: 10px; font-weight: 900;">DEMO ACTIVE</span>
+        </header>
+
+        <main id="tab-home" class="tab-content active">
+            <div class="balance-widget">
+                <div class="balance-label">Total AI Portfolio Value</div>
+                <div class="balance-amount" id="ui-main-balance">€0.00</div>
+                <div style="display: flex; justify-content: center; gap: 10px;">
+                    <button class="btn-action btn-primary-action" style="width: 120px;" onclick="openModal('modal-deposit')">Deposit</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Live AI Trading</div>
+                <div id="ui-transactions">
+                    <div class="text-center" style="color: var(--text-muted); font-size: 13px;">Waiting for next market cycle...</div>
+                </div>
+            </div>
+        </main>
+
+        <main id="tab-analytics" class="tab-content">
+            <div class="card">
+                <div class="card-title">Growth Forecast</div>
+                <canvas id="portfolioChart" height="250"></canvas>
+            </div>
+        </main>
+
+        <main id="tab-profile" class="tab-content">
+            <div class="text-center">
+                <div class="profile-avatar" id="profile-initials">CB</div>
+                <h2 style="font-size: 22px; font-weight: 800; color: #fff; margin-bottom: 5px;" id="profile-name">User</h2>
+                <div class="vip-badge vip-basic" id="profile-vip-badge">🛡️ BASIC TIER</div>
+                
+                <!-- DEMO TOGGLE -->
+                <button class="btn-action btn-demo-mode" id="btn-demo-toggle" onclick="toggleDemo()">Switch to Demo Version</button>
+            </div>
+
+            <!-- WITHDRAWAL SECTION (HIDDEN IN DEMO) -->
+            <div id="withdraw-section" class="card" style="margin-top: 20px;">
+                <div class="card-title">Withdraw Funds</div>
+                <div class="input-group">
+                    <label>Withdrawal Address (USDT TRC20)</label>
+                    <input type="text" id="user-crypto-wallet" class="custom-input" placeholder="Paste address...">
+                </div>
+                <div class="input-group">
+                    <label>Amount (EUR)</label>
+                    <input type="number" id="wd-amount" class="custom-input" placeholder="Min €50">
+                </div>
+                <button class="btn-action btn-primary-action" onclick="processWithdrawal()">Request Payout</button>
+            </div>
+
+            <button class="btn-action" style="background: rgba(255,59,48,0.1); color: #ff3b30; margin-top: 20px;" onclick="handleLogout()">Log Out</button>
+        </main>
+
+        <nav class="bottom-nav">
+            <div class="nav-item active" onclick="switchTab('home', 'Dashboard', this)">
+                <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                <span>Home</span>
+            </div>
+            <div class="nav-item" onclick="switchTab('analytics', 'Analytics', this)">
+                <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                <span>Analytics</span>
+            </div>
+            <div class="nav-item" onclick="switchTab('profile', 'Profile', this)">
+                <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <span>Profile</span>
+            </div>
+        </nav>
+    </div>
+
+    <div id="modal-deposit" class="modal-overlay">
+        <div class="modal-content">
+            <h2 style="color: var(--brand-primary); margin-bottom: 20px;">Deposit</h2>
+            <p style="font-size: 14px; margin-bottom: 15px;">Send USDT (BEP20) to the address below:</p>
+            <div style="background: #000; padding: 15px; border-radius: 10px; font-family: monospace; font-size: 12px; color: var(--brand-primary); word-break: break-all;">
+                0x412De5B79a293BD9b69338f938f578215AD88dDc
+            </div>
+            <button class="btn-action btn-primary-action" style="margin-top: 20px;" onclick="closeModal('modal-deposit')">I have sent the funds</button>
+        </div>
+    </div>
+
+    <div id="toast-container"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+        import { getDatabase, ref, set, get, onValue, serverTimestamp, push } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBqJH2NjEJnRhQ0MKgCsAXUS-q5p4YPHaU",
+            authDomain: "criptobot7777.firebaseapp.com",
+            projectId: "criptobot7777",
+            databaseURL: "https://criptobot7777-default-rtdb.europe-west1.firebasedatabase.app",
+            storageBucket: "criptobot7777.firebasestorage.app",
+            messagingSenderId: "185401450310",
+            appId: "1:185401450310:web:ba330cce0e3bc8da75cf47"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        const AppState = {
+            user: null,
+            uid: null,
+            isDemo: false
+        };
+
+        // LEDGER ENGINE (Fake Blockchain)
+        const startLedger = () => {
+            const container = document.getElementById('ledger-content');
+            const messages = [
+                "Iman Gadzhi's AI: +0.0014 BTC Secured",
+                "Hash 0x8a2...f21 | Transaction Verified",
+                "Node #74: Processing Smart Contract...",
+                "AI Strategy 'Alpha': Long ETH @ €3,140",
+                "Liquidity Pool injected: €42,000.00",
+                "Iman Gadzhi's AI: +0.22 ETH Scanned",
+                "Quantum Shield Encryption: ACTIVE",
+                "System: 14 New Nodes connected to Hive"
+            ];
+            setInterval(() => {
+                const div = document.createElement('div');
+                div.className = 'ledger-line';
+                div.innerHTML = `<span style="color:#fff;">[${new Date().toLocaleTimeString()}]</span> ${messages[Math.floor(Math.random()*messages.length)]}`;
+                container.prepend(div);
+                if(container.children.length > 5) container.lastChild.remove();
+            }, 3000);
+        };
+
+        // UI HELPERS
+        const showToast = (msg) => {
+            const t = document.createElement('div');
+            t.className = 'toast';
+            t.innerText = msg;
+            document.getElementById('toast-container').appendChild(t);
+            setTimeout(() => t.remove(), 3000);
+        };
+
+        window.switchTab = (id, title, el) => {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById(`tab-${id}`).classList.add('active');
+            el.classList.add('active');
+            document.getElementById('header-title-text').innerText = title;
+        };
+
+        window.openModal = (id) => document.getElementById(id).classList.add('open');
+        window.closeModal = (id) => document.getElementById(id).classList.remove('open');
+
+        // DEMO LOGIC
+        window.toggleDemo = () => {
+            AppState.isDemo = !AppState.isDemo;
+            const btn = document.getElementById('btn-demo-toggle');
+            const withdraw = document.getElementById('withdraw-section');
+            const indicator = document.getElementById('demo-indicator');
+
+            if(AppState.isDemo) {
+                btn.innerText = "Exit Demo Mode";
+                withdraw.classList.add('hidden');
+                indicator.classList.remove('hidden');
+                showToast("Demo Mode: €1,000.00 balance granted.");
+            } else {
+                btn.innerText = "Switch to Demo Version";
+                withdraw.classList.remove('hidden');
+                indicator.classList.add('hidden');
+                showToast("Returned to Real Account.");
+            }
+            updateUI();
+        };
+
+        const updateUI = () => {
+            const data = AppState.user;
+            if(!data) return;
+
+            let bal = AppState.isDemo ? 1000 : (data.balance || 0);
+            const eur = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(bal);
+
+            document.getElementById('ui-main-balance').innerText = eur;
+            document.getElementById('profile-name').innerText = data.fullName || "User";
+            document.getElementById('profile-initials').innerText = (data.fullName || "U").substring(0,2).toUpperCase();
+        };
+
+        // AUTH
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('auth-email').value.toLowerCase().trim();
+            const password = document.getElementById('auth-password').value;
+            const btn = document.getElementById('btn-login');
+
+            btn.disabled = true;
+            btn.innerText = "Authenticating...";
+
+            try {
+                // Първо проверяваме дали потребителят съществува
+                const userRef = ref(db, `users/${email.replace(/\./g, '_')}`);
+                const snap = await get(userRef);
+
+                if(snap.exists()) {
+                    const userData = snap.val();
+                    if(userData.password === password) {
+                        loginSuccess(email.replace(/\./g, '_'), userData);
+                    } else {
+                        showToast("Invalid password.");
+                        btn.disabled = false;
+                        btn.innerText = "Access AI Portfolio";
+                    }
+                } else {
+                    // Ако не съществува, го регистрираме автоматично за това Демо
+                    const newId = email.replace(/\./g, '_');
+                    const newUser = {
+                        email, password, balance: 0, fullName: email.split('@')[0], createdAt: Date.now()
+                    };
+                    await set(ref(db, `users/${newId}`), newUser);
+                    loginSuccess(newId, newUser);
+                }
+            } catch(err) {
+                showToast("Connection error.");
+                btn.disabled = false;
+            }
+        });
+
+        const loginSuccess = (uid, data) => {
+            AppState.uid = uid;
+            AppState.user = data;
+            localStorage.setItem('cb_uid', uid);
+            document.getElementById('auth-view').classList.add('hidden');
+            document.getElementById('app-view').classList.remove('hidden');
+            
+            onValue(ref(db, `users/${uid}`), (s) => {
+                AppState.user = s.val();
+                updateUI();
+            });
+        };
+
+        window.handleLogout = () => {
+            localStorage.removeItem('cb_uid');
+            window.location.reload();
+        };
+
+        window.processWithdrawal = async () => {
+            if(AppState.isDemo) return;
+            const amount = parseFloat(document.getElementById('wd-amount').value);
+            const address = document.getElementById('user-crypto-wallet').value;
+
+            if(amount < 50 || !address) return showToast("Min €50 and valid address required.");
+            if(amount > AppState.user.balance) return showToast("Insufficient balance.");
+
+            await push(ref(db, 'withdrawals'), { uid: AppState.uid, amount, address, status: 'pending' });
+            await set(ref(db, `users/${AppState.uid}/balance`), AppState.user.balance - amount);
+            showToast("Withdrawal requested.");
+        };
+
+        // INIT
+        document.addEventListener('DOMContentLoaded', () => {
+            startLedger();
+            const saved = localStorage.getItem('cb_uid');
+            if(saved) {
+                get(ref(db, `users/${saved}`)).then(s => {
+                    if(s.exists()) loginSuccess(saved, s.val());
+                });
+            }
+        });
+
+    </script>
+</body>
+</html>
