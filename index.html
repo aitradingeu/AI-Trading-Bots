@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CriptoBot Enterprise | Advanced AI Ecosystem</title>
+    
+    <!-- External Resources -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* 
+           ==========================================================================
+           1. CSS VARIABLES & THEMES (GOLD & DARK BLUE)
+           ========================================================================== 
+        */
+        :root {
+            --brand-primary: #d4af37; 
+            --brand-primary-hover: #ffdf00;
+            --brand-dark: #000b18;
+            --bg-main: #001224; 
+            --bg-card: rgba(0, 31, 63, 0.7); 
+            --text-main: #ffffff;
+            --text-muted: #8da3b8;
+            --success: #00ff88;
+            --danger: #ff3b30;
+            --warning: #ffcc00;
+            --border-light: rgba(212, 175, 55, 0.2); 
+            --shadow-sm: 0 4px 15px rgba(0,0,0,0.3);
+            --shadow-md: 0 8px 30px rgba(0, 11, 24, 0.8);
+            --shadow-lg: 0 0 20px rgba(212, 175, 55, 0.2);
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --radius-xl: 32px;
+            --transition-fast: 0.2s ease;
+        }
+
+        /* 
+           ==========================================================================
+           2. GLOBAL RESET
+           ========================================================================== 
+        */
+        *, *::before, *::after { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at top, #001a33 0%, #000b18 100%);
+            color: var(--text-main);
+            -webkit-tap-highlight-color: transparent;
+            line-height: 1.5;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--brand-primary); border-radius: 10px; }
+
+        /* Helpers */
+        .hidden { display: none !important; }
+        .text-center { text-align: center; }
+        .font-bold { font-weight: 700; }
+        .flex { display: flex; } 
+        .items-center { align-items: center; } 
+        .justify-between { justify-content: space-between; }
+        .mt-1 { margin-top: 8px; } 
+        .mt-2 { margin-top: 16px; } 
+        .mt-3 { margin-top: 24px; }
+
+        /* 
+           ==========================================================================
+           3. COMPONENTS - TICKER & NOTIFICATIONS
+           ========================================================================== 
+        */
+        .ticker-wrap { 
+            width: 100%; 
+            background: #000; 
+            border-bottom: 1px solid var(--brand-primary); 
+            padding: 8px 0; 
+            overflow: hidden; 
+            position: sticky; 
+            top: 0; 
+            z-index: 1001; 
+        }
+
+        .ticker { 
+            display: flex; 
+            white-space: nowrap; 
+            animation: ticker 40s linear infinite; 
+            font-size: 13px; 
+            font-weight: 700; 
+            color: var(--text-main); 
+        }
+
+        @keyframes ticker { 
+            0% { transform: translateX(100%); } 
+            100% { transform: translateX(-100%); } 
+        }
+
+        .social-proof-toast { 
+            position: fixed; 
+            bottom: 90px; 
+            left: -100%; 
+            background: rgba(0, 11, 24, 0.95); 
+            border-left: 4px solid var(--success); 
+            color: #fff; 
+            padding: 12px 20px; 
+            border-radius: 0 var(--radius-md) var(--radius-md) 0; 
+            font-size: 13px; 
+            font-weight: 700; 
+            box-shadow: var(--shadow-lg); 
+            z-index: 999; 
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); 
+            backdrop-filter: blur(10px); 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+        }
+
+        .social-proof-toast.show { left: 0; }
+
+        /* 
+           ==========================================================================
+           4. AUTHENTICATION VIEW
+           ========================================================================== 
+        */
+        #auth-view { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            min-height: 100vh; 
+            padding: 20px; 
+            animation: fadeIn 0.5s ease;
+        }
+
+        .auth-container { 
+            width: 100%; 
+            max-width: 420px; 
+            background: var(--bg-card); 
+            backdrop-filter: blur(15px); 
+            padding: 40px 25px; 
+            border-radius: var(--radius-xl); 
+            border: 1px solid var(--border-light); 
+            box-shadow: var(--shadow-md); 
+        }
+
+        .auth-header { text-align: center; margin-bottom: 30px; }
+        .auth-header h1 { 
+            font-size: 38px; 
+            font-weight: 900; 
+            color: var(--brand-primary); 
+            letter-spacing: -1.5px; 
+            text-shadow: 0 0 15px rgba(212,175,55,0.4);
+        }
+
+        .input-group { margin-bottom: 20px; position: relative; }
+        .input-group label { 
+            display: block; 
+            font-size: 11px; 
+            font-weight: 800; 
+            color: var(--brand-primary); 
+            margin-bottom: 8px; 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px;
+        }
+
+        .custom-input { 
+            width: 100%; 
+            padding: 15px 18px; 
+            border: 1px solid rgba(255,255,255,0.1); 
+            border-radius: var(--radius-md); 
+            font-size: 15px; 
+            background: rgba(0,0,0,0.5); 
+            color: #fff; 
+            transition: var(--transition-fast); 
+        }
+
+        .custom-input:focus { 
+            outline: none; 
+            border-color: var(--brand-primary); 
+            box-shadow: 0 0 15px rgba(212,175,55,0.2); 
+        }
+
+        /* Password Toggle Styling */
+        .pass-wrapper { position: relative; }
+        .toggle-pass { 
+            position: absolute; 
+            right: 15px; 
+            top: 50%; 
+            transform: translateY(-50%); 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            opacity: 0.6; 
+            transition: 0.2s;
+            z-index: 10;
+        }
+        .toggle-pass:hover { opacity: 1; }
+        .toggle-pass svg { width: 22px; height: 22px; fill: var(--brand-primary); }
+
+        .btn-main { 
+            width: 100%; 
+            padding: 16px; 
+            background: linear-gradient(45deg, #d4af37, #ffdf00); 
+            color: #000; 
+            border: none; 
+            border-radius: 100px; 
+            font-size: 16px; 
+            font-weight: 800; 
+            text-transform: uppercase; 
+            cursor: pointer; 
+            transition: var(--transition-fast); 
+            box-shadow: 0 4px 15px rgba(212,175,55,0.3); 
+        }
+
+        .btn-main:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(212,175,55,0.5); }
+
+        .auth-mode-switch { 
+            text-align: center; 
+            margin-top: 25px; 
+            font-size: 13px; 
+            color: var(--text-muted); 
+            cursor: pointer; 
+            display: block; 
+            font-weight: 600;
+        }
+        .auth-mode-switch strong { color: var(--brand-primary); }
+
+        /* 
+           ==========================================================================
+           5. DASHBOARD STRUCTURE
+           ========================================================================== 
+        */
+        #app-view { padding-bottom: 100px; }
+        .app-header { 
+            background: var(--bg-card); 
+            backdrop-filter: blur(10px); 
+            padding: 16px 24px; 
+            border-bottom: 1px solid var(--border-light); 
+            position: sticky; 
+            top: 34px; 
+            z-index: 100; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+        }
+
+        .header-status { font-size: 10px; color: var(--success); font-weight: 800; border: 1px solid var(--success); padding: 4px 10px; border-radius: 20px; }
+
+        /* Bottom Navigation */
+        .bottom-nav { 
+            position: fixed; 
+            bottom: 0; 
+            left: 0; 
+            right: 0; 
+            height: 75px; 
+            background: #000b18; 
+            border-top: 1px solid var(--border-light); 
+            display: flex; 
+            justify-content: space-around; 
+            align-items: center; 
+            z-index: 1000; 
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .nav-item { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            color: var(--text-muted); 
+            cursor: pointer; 
+            width: 20%; 
+            height: 100%; 
+            transition: var(--transition-fast); 
+            font-size: 9px; 
+            font-weight: 700; 
+            text-transform: uppercase;
+        }
+
+        .nav-item svg { width: 22px; height: 22px; margin-bottom: 4px; fill: currentColor; }
+        .nav-item.active { color: var(--brand-primary); }
+
+        /* 
+           ==========================================================================
+           6. TABS & CARDS
+           ========================================================================== 
+        */
+        .tab-content { display: none; padding: 20px; animation: slideUp 0.4s ease; max-width: 600px; margin: 0 auto; }
+        .tab-content.active { display: block; }
+
+        .balance-widget { 
+            background: linear-gradient(135deg, rgba(0,31,63,0.9), rgba(0,11,24,0.9)); 
+            border-radius: var(--radius-xl); 
+            padding: 35px 20px; 
+            text-align: center; 
+            box-shadow: var(--shadow-lg); 
+            margin-bottom: 24px; 
+            border: 1px solid var(--border-light); 
+        }
+
+        .balance-label { color: var(--brand-primary); font-size: 13px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
+        .balance-amount { font-size: 48px; font-weight: 900; color: #fff; margin: 12px 0; letter-spacing: -1px; }
+
+        .card { 
+            background: var(--bg-card); 
+            backdrop-filter: blur(10px); 
+            border-radius: var(--radius-lg); 
+            padding: 22px; 
+            margin-bottom: 20px; 
+            border: 1px solid var(--border-light); 
+        }
+
+        .card-title { font-size: 15px; font-weight: 800; color: var(--brand-primary); text-transform: uppercase; margin-bottom: 18px; letter-spacing: 0.5px; }
+
+        /* Blockchain Tab Specifics */
+        .blockchain-list { font-family: 'Courier New', monospace; }
+        .bc-item { 
+            background: rgba(0,0,0,0.4); 
+            padding: 15px; 
+            border-radius: 14px; 
+            margin-bottom: 12px; 
+            border-left: 4px solid var(--success); 
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+
+        .bc-hash { color: var(--brand-primary); font-size: 11px; margin-bottom: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .bc-meta { display: flex; justify-content: space-between; font-size: 12px; font-weight: bold; }
+
+        /* 
+           ==========================================================================
+           7. UTILS: TOASTS, MODALS, BUTTONS
+           ========================================================================== 
+        */
+        .btn-action { 
+            width: 100%; 
+            padding: 15px; 
+            border-radius: var(--radius-md); 
+            border: none; 
+            font-size: 14px; 
+            font-weight: 800; 
+            cursor: pointer; 
+            text-transform: uppercase; 
+            transition: 0.2s; 
+        }
+
+        .btn-primary-action { background: var(--brand-primary); color: #000; }
+        .btn-secondary-action { background: transparent; color: var(--brand-primary); border: 2px solid var(--brand-primary); }
+
+        #toast-container { position: fixed; top: 70px; left: 50%; transform: translateX(-50%); z-index: 9999; width: 90%; max-width: 400px; }
+        .toast { 
+            background: #000; 
+            color: #fff; 
+            padding: 15px 22px; 
+            border: 1px solid var(--brand-primary); 
+            border-radius: var(--radius-md); 
+            font-size: 14px; 
+            font-weight: 600; 
+            margin-bottom: 10px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+            animation: toastIn 0.3s forwards, toastOut 0.3s ease 3.5s forwards;
+        }
+
+        @keyframes toastIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes toastOut { from { opacity: 1; } to { opacity: 0; transform: translateY(-20px); } }
+
+        /* Profile & Demo Switch */
+        .demo-toggle-btn { 
+            background: rgba(212, 175, 55, 0.1); 
+            color: var(--brand-primary); 
+            border: 1px solid var(--brand-primary); 
+            margin-top: 15px; 
+        }
+        .demo-toggle-btn.active { background: var(--success); color: #000; border-color: var(--success); }
+
+    </style>
+</head>
+<body>
+
+    <!-- Social Proof Notification -->
+    <div id="live-notification" class="social-proof-toast">
+        <div class="status-dot"></div>
+        <span id="live-noti-text"></span>
+    </div>
+
+    <!-- Market Ticker -->
+    <div class="ticker-wrap">
+        <div class="ticker" id="top-ticker">
+            <span style="margin-right: 50px;">BTC/EUR: €94,320.15 <span style="color:var(--success);">▲ 2.1%</span></span>
+            <span style="margin-right: 50px;">ETH/EUR: €3,220.44 <span style="color:var(--success);">▲ 1.4%</span></span>
+            <span style="margin-right: 50px;">SOL/EUR: €194.12 <span style="color:var(--danger);">▼ 0.3%</span></span>
+            <span style="margin-right: 50px;">LGBTC/EUR: €1.48 <span style="color:var(--success);">▲ 15.2%</span></span>
+        </div>
+    </div>
+
+    <!-- 
+       ==========================================================================
+       AUTH VIEW
+       ========================================================================== 
+    -->
+    <div id="auth-view">
+        <div class="auth-container">
+            <div class="auth-header">
+                <h1>CriptoBot</h1>
+                <p style="color: var(--brand-primary); font-size: 13px; font-weight: 700;">Enterprise AI Ecosystem</p>
+            </div>
+
+            <form id="auth-form">
+                <!-- Registration Specific Fields -->
+                <div id="auth-reg-fields">
+                    <div class="input-group">
+                        <label>Full Name</label>
+                        <input type="text" id="auth-name" class="custom-input" placeholder="e.g., John Doe">
+                    </div>
+                    <div class="input-group">
+                        <label>Age (18+)</label>
+                        <input type="number" id="auth-age" class="custom-input" placeholder="18">
+                    </div>
+                    <div class="input-group">
+                        <label>Phone Number</label>
+                        <input type="tel" id="auth-phone" class="custom-input">
+                    </div>
+                </div>
+
+                <!-- Shared Fields -->
+                <div class="input-group">
+                    <label>Email Address</label>
+                    <input type="email" id="auth-email" class="custom-input" required placeholder="name@domain.com">
+                </div>
+
+                <div class="input-group">
+                    <label>Security Password</label>
+                    <div class="pass-wrapper">
+                        <input type="password" id="auth-password" class="custom-input" required placeholder="••••••••">
+                        <div class="toggle-pass" onclick="togglePasswordVisibility('auth-password', this)">
+                            <!-- Eye Open SVG -->
+                            <svg id="eye-open" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+                            <!-- Eye Closed SVG -->
+                            <svg id="eye-closed" class="hidden" viewBox="0 0 24 24"><path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.82l2.92 2.92c1.51-1.26 2.7-2.89 3.44-4.74-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-main" id="auth-submit-btn">Create Enterprise Account</button>
+            </form>
+
+            <span class="auth-mode-switch" onclick="toggleAuthMode()" id="auth-switch-text">
+                Already have an account? <strong>Log In</strong>
+            </span>
+        </div>
+    </div>
+
+    <!-- 
+       ==========================================================================
+       APP VIEW
+       ========================================================================== 
+    -->
+    <div id="app-view" class="hidden">
+        
+        <header class="app-header">
+            <div class="flex items-center gap-2">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="var(--brand-primary)"/>
+                </svg>
+                <div class="font-bold" id="header-title" style="color:var(--brand-primary); letter-spacing: 1px;">DASHBOARD</div>
+            </div>
+            <div class="header-status">● SYSTEM ACTIVE</div>
+        </header>
+
+        <!-- Tab: Home -->
+        <main id="tab-home" class="tab-content active">
+            <div class="balance-widget">
+                <div class="balance-label">Total Portfolio Value</div>
+                <div class="balance-amount" id="ui-balance">€0.00</div>
+                <div class="status-badge">
+                    <div class="status-dot"></div>
+                    AI Trading Engine Active
+                </div>
+                
+                <div class="mt-3">
+                    <div class="flex justify-between" style="font-size: 11px; color: var(--brand-primary); margin-bottom: 6px;">
+                        <span>Profit Cycle</span>
+                        <span id="ai-cycle-percent">0%</span>
+                    </div>
+                    <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden;">
+                        <div id="ai-progress-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--brand-primary), #fff);"></div>
+                    </div>
+                </div>
+
+                <div class="flex gap-2 mt-3" style="gap: 12px;">
+                    <button class="btn-action btn-primary-action" onclick="openDepositModal()">Deposit</button>
+                    <button class="btn-action btn-secondary-action" onclick="switchTab('profile', 'Account', document.querySelectorAll('.nav-item')[4])">Withdraw</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Live AI Executions</div>
+                <div id="ui-trades-container">
+                    <div class="text-center" style="color: var(--text-muted); font-size: 12px; padding: 20px;">Analyzing market liquidity...</div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Tab: Analytics -->
+        <main id="tab-analytics" class="tab-content">
+            <div class="card">
+                <div class="card-title">Portfolio Growth (7D)</div>
+                <div class="chart-container">
+                    <canvas id="portfolioChart" height="250"></canvas>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-title">Algorithm Performance</div>
+                <div class="flex justify-between mt-2"><span style="color:var(--text-muted)">Win Rate</span><span class="font-bold text-success" style="color:var(--success)">94.2%</span></div>
+                <div class="flex justify-between mt-2"><span style="color:var(--text-muted)">Avg. Monthly ROI</span><span class="font-bold" style="color:#fff">+22.4%</span></div>
+            </div>
+        </main>
+
+        <!-- Tab: Blockchain (NEW) -->
+        <main id="tab-blockchain" class="tab-content">
+            <div class="card">
+                <div class="card-title">Real-time Node Explorer</div>
+                <div id="blockchain-live-list" class="blockchain-list">
+                    <!-- Transactions injected here -->
+                </div>
+            </div>
+        </main>
+
+        <!-- Tab: Markets -->
+        <main id="tab-markets" class="tab-content">
+            <div class="card" style="padding: 10px;">
+                <input type="text" class="custom-input" placeholder="Search Markets (BTC, ETH, SOL...)" onkeyup="MarketAPI.filter(this.value)">
+            </div>
+            <div id="market-list-container">
+                <div class="text-center" style="padding: 40px; color: var(--text-muted);">Syncing exchange data...</div>
+            </div>
+        </main>
+
+        <!-- Tab: Profile -->
+        <main id="tab-profile" class="tab-content">
+            <div class="text-center" style="margin-bottom: 30px;">
+                <div id="ui-profile-initials" style="width:80px; height:80px; background:linear-gradient(45deg, var(--brand-primary), #ffdf00); border-radius:50%; margin: 0 auto 15px; color:#000; display:flex; align-items:center; justify-content:center; font-size:30px; font-weight:900; box-shadow: var(--shadow-lg);">CB</div>
+                <h2 id="ui-profile-name" style="font-weight: 800; font-size: 24px;">User Name</h2>
+                <p style="font-size: 13px; color: var(--text-muted);">Enterprise Grade Account</p>
+            </div>
+
+            <!-- This section hides in Demo Mode -->
+            <div class="card" id="withdrawal-section">
+                <div class="card-title">Funds Management</div>
+                <div class="input-group">
+                    <label>Withdraw to USDT Address (TRC20)</label>
+                    <input type="text" id="ui-wallet-address" class="custom-input" placeholder="Paste TRC20 address...">
+                </div>
+                <div class="input-group">
+                    <label>Amount to Withdraw (EUR)</label>
+                    <input type="number" id="ui-withdraw-amount" class="custom-input" placeholder="Min. €50.00">
+                </div>
+                <button class="btn-action btn-primary-action" onclick="handleWithdrawal()">Confirm Withdrawal</button>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Account Security</div>
+                <div class="flex justify-between mb-3"><span style="color:var(--text-muted)">Identity Verification</span><span style="color:var(--success)">Verified</span></div>
+                <button class="btn-action demo-toggle-btn" id="demo-btn" onclick="toggleDemoMode()">Activate Demo Access</button>
+                <button class="btn-action" style="margin-top:20px; background:rgba(255,59,48,0.1); color:var(--danger); border:1px solid rgba(255,59,48,0.2);" onclick="handleLogout()">Secure Logout</button>
+            </div>
+        </main>
+
+        <!-- Navigation -->
+        <nav class="bottom-nav">
+            <div class="nav-item active" onclick="switchTab('home', 'Dashboard', this)">
+                <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                <span>Home</span>
+            </div>
+            <div class="nav-item" onclick="switchTab('analytics', 'Analytics', this)">
+                <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+                <span>Stats</span>
+            </div>
+            <div class="nav-item" onclick="switchTab('blockchain', 'Blockchain', this)">
+                <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                <span>Chain</span>
+            </div>
+            <div class="nav-item" onclick="switchTab('markets', 'Markets', this)">
+                <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                <span>Markets</span>
+            </div>
+            <div class="nav-item" onclick="switchTab('profile', 'Account', this)">
+                <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                <span>Profile</span>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Modals -->
+    <div id="modal-deposit" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:2000; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(10px);">
+        <div class="card" style="width:90%; max-width:400px; text-align:center;">
+            <h2 style="color:var(--brand-primary); margin-bottom:20px;">Deposit USDT</h2>
+            <div style="background:#fff; padding:15px; border-radius:15px; display:inline-block; margin-bottom:20px;">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=0x412De5B79a293BD9b69338f938f578215AD88dDc" style="display:block;">
+            </div>
+            <p style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">Network: BEP20 / TRC20</p>
+            <div style="background:rgba(0,0,0,0.5); padding:12px; border-radius:10px; font-family:monospace; font-size:12px; color:var(--brand-primary); word-break:break-all; margin-bottom:20px; border:1px dashed var(--brand-primary);">0x412De5B79a293BD9b69338f938f578215AD88dDc</div>
+            <button class="btn-action btn-primary-action" onclick="closeDepositModal()">I Have Sent the Funds</button>
+        </div>
+    </div>
+
+    <div id="toast-container"></div>
+
+    <!-- 
+       ==========================================================================
+       SCRIPTS & LOGIC
+       ========================================================================== 
+    -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
+    <script type="module">
+        /* 
+           1. FIREBASE INITIALIZATION
+           -------------------------------------------------------------------------- 
+        */
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+        import { getDatabase, ref, set, get, onValue, query, orderByChild, equalTo, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBqJH2NjEJnRhQ0MKgCsAXUS-q5p4YPHaU",
+            authDomain: "criptobot7777.firebaseapp.com",
+            projectId: "criptobot7777",
+            databaseURL: "https://criptobot7777-default-rtdb.europe-west1.firebasedatabase.app",
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        /* 
+           2. GLOBAL STATE
+           -------------------------------------------------------------------------- 
+        */
+        window.AppState = {
+            isLogin: false, // Toggles between Reg and Login
+            isDemo: false,  // Toggles Demo Mode
+            user: null,
+            uid: null,
+            fakeBalance: 2485.65,
+            marketData: [],
+            currentChart: null
+        };
+
+        /* 
+           3. UI CONTROLLER
+           -------------------------------------------------------------------------- 
+        */
+        const UI = {
+            phoneInput: null,
+
+            init() {
+                this.phoneInput = window.intlTelInput(document.querySelector("#auth-phone"), {
+                    preferredCountries: ["bg", "de", "gb", "us"],
+                    separateDialCode: true,
+                    utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+                });
+            },
+
+            showToast(msg) {
+                const container = document.getElementById('toast-container');
+                const toast = document.createElement('div');
+                toast.className = 'toast';
+                toast.innerText = msg;
+                container.appendChild(toast);
+                setTimeout(() => toast.remove(), 3800);
+            },
+
+            showLiveNotification(msg) {
+                const noti = document.getElementById('live-notification');
+                document.getElementById('live-noti-text').innerText = msg;
+                noti.classList.add('show');
+                setTimeout(() => noti.classList.remove('show'), 5000);
+            },
+
+            switchTab(id, title, el) {
+                document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                
+                document.getElementById(`tab-${id}`).classList.add('active');
+                if(el) el.classList.add('active');
+                document.getElementById('header-title').innerText = title;
+
+                if(id === 'markets' && AppState.marketData.length === 0) MarketAPI.fetch();
+                if(id === 'analytics') this.renderChart();
+            },
+
+            updateApp(data) {
+                const balElement = document.getElementById('ui-balance');
+                const displayBal = AppState.isDemo ? AppState.fakeBalance : (data.balance || 0);
+                
+                // Animate balance
+                balElement.innerText = `€${displayBal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                
+                document.getElementById('ui-profile-name').innerText = data.fullName;
+                const initials = data.fullName.split(' ').map(n => n[0]).join('').toUpperCase().substring(0,2);
+                document.getElementById('ui-profile-initials').innerText = initials || "CB";
+
+                // Handle Demo Mode View
+                const withdrawalSec = document.getElementById('withdrawal-section');
+                if(AppState.isDemo) {
+                    withdrawalSec.classList.add('hidden');
+                } else {
+                    withdrawalSec.classList.remove('hidden');
+                }
+
+                if(displayBal > 0) TradingEngine.start();
+            },
+
+            renderChart() {
+                if(AppState.currentChart) return;
+                const ctx = document.getElementById('portfolioChart').getContext('2d');
+                AppState.currentChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+                        datasets: [{
+                            label: 'Equity EUR',
+                            data: [1200, 1450, 1300, 1700, 1900, 2100, 2485],
+                            borderColor: '#d4af37',
+                            backgroundColor: 'rgba(212, 175, 55, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { display: false } },
+                        scales: { y: { grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { display: false } } }
+                    }
+                });
+            }
+        };
+
+        /* 
+           4. AUTHENTICATION LOGIC
+           -------------------------------------------------------------------------- 
+        */
+        window.togglePasswordVisibility = (inputId, el) => {
+            const input = document.getElementById(inputId);
+            const open = el.querySelector('#eye-open');
+            const closed = el.querySelector('#eye-closed');
+
+            if(input.type === 'password') {
+                input.type = 'text';
+                open.classList.add('hidden');
+                closed.classList.remove('hidden');
+            } else {
+                input.type = 'password';
+                open.classList.remove('hidden');
+                closed.classList.add('hidden');
+            }
+        };
+
+        window.toggleAuthMode = () => {
+            AppState.isLogin = !AppState.isLogin;
+            const regFields = document.getElementById('auth-reg-fields');
+            const submitBtn = document.getElementById('auth-submit-btn');
+            const switchTxt = document.getElementById('auth-switch-text');
+
+            if(AppState.isLogin) {
+                regFields.classList.add('hidden');
+                submitBtn.innerText = 'Log In to Dashboard';
+                switchTxt.innerHTML = "New here? <strong>Create Account</strong>";
+            } else {
+                regFields.classList.remove('hidden');
+                submitBtn.innerText = 'Create Enterprise Account';
+                switchTxt.innerHTML = "Already have an account? <strong>Log In</strong>";
+            }
+        };
+
+        const handleAuth = async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('auth-email').value.toLowerCase().trim();
+            const pass = document.getElementById('auth-password').value;
+            const btn = document.getElementById('auth-submit-btn');
+            
+            btn.disabled = true;
+            btn.innerText = 'Connecting...';
+
+            const userRefId = btoa(email).replace(/=/g, '');
+
+            try {
+                if(AppState.isLogin) {
+                    const snap = await get(ref(db, `users/${userRefId}`));
+                    if(snap.exists() && snap.val().password === pass) {
+                        localStorage.setItem('bot_session', userRefId);
+                        location.reload();
+                    } else {
+                        UI.showToast("Incorrect credentials!");
+                        btn.disabled = false;
+                        btn.innerText = 'Log In to Dashboard';
+                    }
+                } else {
+                    const name = document.getElementById('auth-name').value;
+                    const age = document.getElementById('auth-age').value;
+                    if(!name || age < 18) {
+                        UI.showToast("Valid name and age required.");
+                        btn.disabled = false;
+                        return;
+                    }
+                    await set(ref(db, `users/${userRefId}`), {
+                        fullName: name, email, password: pass, age, balance: 0, createdAt: Date.now()
+                    });
+                    localStorage.setItem('bot_session', userRefId);
+                    location.reload();
+                }
+            } catch(err) {
+                UI.showToast("System busy. Try again.");
+                btn.disabled = false;
+            }
+        };
+
+        /* 
+           5. SYSTEM ENGINES (BLOCKCHAIN, TRADING, MARKETS)
+           -------------------------------------------------------------------------- 
+        */
+        const BlockchainEngine = {
+            start() {
+                const list = document.getElementById('blockchain-live-list');
+                setInterval(() => {
+                    if(document.getElementById('tab-blockchain').classList.contains('active') || Math.random() > 0.7) {
+                        const hash = '0x' + Math.random().toString(16).slice(2, 12).toUpperCase() + '...';
+                        const amount = (Math.random() * 0.5).toFixed(5);
+                        const item = document.createElement('div');
+                        item.className = 'bc-item';
+                        item.innerHTML = `
+                            <div class="bc-hash">${hash}</div>
+                            <div class="bc-meta">
+                                <span style="color:var(--text-muted)">Block Validated</span>
+                                <span style="color:var(--success)">+${amount} BTC</span>
+                            </div>
+                        `;
+                        list.prepend(item);
+                        if(list.children.length > 15) list.lastChild.remove();
+                    }
+                }, 2800);
+            }
+        };
+
+        const TradingEngine = {
+            start() {
+                let p = 0;
+                setInterval(() => {
+                    p = (p + 2) % 102;
+                    document.getElementById('ai-cycle-percent').innerText = p + '%';
+                    document.getElementById('ai-progress-bar').style.width = p + '%';
+                    
+                    if(p === 100) {
+                        UI.showToast("AI Cycle Complete: Profit realized.");
+                    }
+                }, 1500);
+            }
+        };
+
+        const MarketAPI = {
+            async fetch() {
+                const container = document.getElementById('market-list-container');
+                try {
+                    const res = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=eur&order=market_cap_desc&per_page=15');
+                    const data = await res.json();
+                    AppState.marketData = data;
+                    this.render(data);
+                } catch(e) {
+                    container.innerHTML = '<div class="text-center">API rate limit reached.</div>';
+                }
+            },
+            render(data) {
+                let html = '';
+                data.forEach(c => {
+                    const isPos = c.price_change_percentage_24h > 0;
+                    html += `
+                        <div class="card flex justify-between items-center" style="margin-bottom:10px;">
+                            <div class="flex items-center gap-3">
+                                <img src="${c.image}" style="width:30px;">
+                                <div>
+                                    <div class="font-bold">${c.name}</div>
+                                    <div style="font-size:10px; color:var(--text-muted)">${c.symbol.toUpperCase()}</div>
+                                </div>
+                            </div>
+                            <div style="text-align:right">
+                                <div class="font-bold">€${c.current_price.toLocaleString()}</div>
+                                <div style="font-size:12px; color:${isPos ? 'var(--success)' : 'var(--danger)'}">${isPos?'+':''}${c.price_change_percentage_24h.toFixed(2)}%</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                document.getElementById('market-list-container').innerHTML = html;
+            },
+            filter(val) {
+                const filtered = AppState.marketData.filter(c => c.name.toLowerCase().includes(val.toLowerCase()) || c.symbol.toLowerCase().includes(val.toLowerCase()));
+                this.render(filtered);
+            }
+        };
+
+        const SocialProof = {
+            start() {
+                const msgs = [
+                    "Someone from Germany just deposited €1,200",
+                    "New Enterprise member joined from UK",
+                    "AI Bot just secured +€45.20 profit for User#482",
+                    "Withdrawal of €850 processed to Binance",
+                    "System load: Stable | Nodes: 14/14"
+                ];
+                setInterval(() => {
+                    UI.showLiveNotification(msgs[Math.floor(Math.random() * msgs.length)]);
+                }, 15000);
+            }
+        };
+
+        /* 
+           6. ACTIONS & WINDOW EXPORTS
+           -------------------------------------------------------------------------- 
+        */
+        window.switchTab = (id, title, el) => UI.switchTab(id, title, el);
+        window.openDepositModal = () => document.getElementById('modal-deposit').classList.remove('hidden');
+        window.closeDepositModal = () => {
+            document.getElementById('modal-deposit').classList.add('hidden');
+            UI.showToast("Deposit tracking activated. Please wait for blockchain confirmations.");
+        };
+        window.toggleDemoMode = () => {
+            AppState.isDemo = !AppState.isDemo;
+            const btn = document.getElementById('demo-btn');
+            if(AppState.isDemo) {
+                btn.innerText = 'Return to Real Account';
+                btn.classList.add('active');
+                UI.showToast("Demo Mode Enabled: Features limited.");
+            } else {
+                btn.innerText = 'Activate Demo Access';
+                btn.classList.remove('active');
+                UI.showToast("Switched to Live Portfolio.");
+            }
+            UI.updateApp(AppState.user);
+        };
+        window.handleLogout = () => { localStorage.clear(); location.reload(); };
+
+        /* 
+           7. INITIALIZATION CALL
+           -------------------------------------------------------------------------- 
+        */
+        document.addEventListener('DOMContentLoaded', () => {
+            UI.init();
+            document.getElementById('auth-form').addEventListener('submit', handleAuth);
+
+            const sessionUid = localStorage.getItem('bot_session');
+            if(sessionUid) {
+                onValue(ref(db, `users/${sessionUid}`), snap => {
+                    if(snap.exists()) {
+                        AppState.user = snap.val();
+                        AppState.uid = sessionUid;
+                        document.getElementById('auth-view').classList.add('hidden');
+                        document.getElementById('app-view').classList.remove('hidden');
+                        UI.updateApp(snap.val());
+                        BlockchainEngine.start();
+                        SocialProof.start();
+                    }
+                });
+            }
+        });
+
+    </script>
+</body>
+</html>
