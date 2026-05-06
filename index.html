@@ -1,0 +1,1533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ai Trading Bot | Advanced Ecosystem</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* ==========================================================================
+           1. CSS VARIABLES, RESET & THEMES (Royal Blue, Bright Gold & Silver Edition)
+           ========================================================================== */
+        :root {
+            /* Златно */
+            --brand-primary: #FFD700; 
+            --brand-primary-hover: #FFC107;
+            /* Тъмно Синьо */
+            --brand-dark: #0A192F; 
+            --bg-main: #0B1325; 
+            --bg-card: rgba(16, 33, 65, 0.85); 
+            /* Бяло и Сиво */
+            --text-main: #ffffff;
+            --text-muted: #A0B2C6; /* Светло сиво-синьо за текст */
+            
+            --success: #00E676;
+            --danger: #FF3D00;
+            --warning: #FFC107;
+            
+            /* Златни рамки */
+            --border-light: rgba(255, 215, 0, 0.3); 
+            
+            --shadow-sm: 0 4px 15px rgba(0,0,0,0.5);
+            --shadow-md: 0 8px 30px rgba(0, 0, 0, 0.9);
+            --shadow-lg: 0 0 25px rgba(255, 215, 0, 0.15); /* Златна сянка */
+            
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --radius-xl: 32px;
+            --transition-fast: 0.2s ease;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        *, *::before, *::after { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            /* Ясен тъмносин градиент */
+            background: radial-gradient(circle at top, #112A46 0%, #060B14 100%);
+            color: var(--text-main);
+            -webkit-tap-highlight-color: transparent;
+            line-height: 1.5;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(10, 25, 47, 0.5); }
+        ::-webkit-scrollbar-thumb { background: var(--brand-primary); border-radius: 10px; }
+
+        .hidden { display: none !important; }
+        .text-center { text-align: center; }
+        .font-bold { font-weight: 700; }
+        .mt-1 { margin-top: 8px; } .mt-2 { margin-top: 16px; } .mt-3 { margin-top: 24px; }
+        .mb-1 { margin-bottom: 8px; } .mb-2 { margin-bottom: 16px; } .mb-3 { margin-bottom: 24px; }
+        .flex { display: flex; } .items-center { align-items: center; } .justify-between { justify-content: space-between; }
+        .w-full { width: 100%; }
+
+        /* Ticker Tape */
+        .ticker-wrap { 
+            width: 100%; 
+            background: var(--brand-dark); 
+            border-bottom: 2px solid var(--brand-primary); 
+            padding: 8px 0; 
+            overflow: hidden; 
+            position: sticky; 
+            top: 0; 
+            z-index: 1001; 
+        }
+        .ticker { 
+            display: flex; 
+            white-space: nowrap; 
+            animation: ticker 30s linear infinite; 
+            font-size: 13px; 
+            font-weight: 700; 
+            color: var(--brand-primary); 
+        }
+        @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+
+        /* ==========================================================================
+           2. AUTHENTICATION MODULE
+           ========================================================================== */
+        #auth-view { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            min-height: 100vh; 
+            padding: 20px; 
+            animation: fadeIn 0.5s ease-in-out; 
+        }
+        .auth-container { 
+            width: 100%; 
+            max-width: 420px; 
+            background: var(--bg-card); 
+            backdrop-filter: blur(10px); 
+            padding: 40px 20px; 
+            border-radius: var(--radius-xl); 
+            border: 1px solid var(--border-light); 
+            box-shadow: var(--shadow-lg); 
+        }
+        .auth-header { text-align: center; margin-bottom: 30px; }
+        .auth-header h1 { 
+            font-size: 36px; 
+            font-weight: 900; 
+            color: var(--brand-primary); 
+            letter-spacing: -1px; 
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.5); 
+            margin-bottom: 8px; 
+        }
+        
+        .input-group { margin-bottom: 18px; position: relative; }
+        .input-group label { 
+            display: block; 
+            font-size: 12px; 
+            font-weight: 800; 
+            color: var(--text-muted); 
+            margin-bottom: 8px; 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px;
+        }
+        .custom-input { 
+            width: 100%; 
+            padding: 16px 18px; 
+            border: 1px solid rgba(255, 215, 0, 0.2); 
+            border-radius: var(--radius-md); 
+            font-size: 15px; 
+            background: rgba(10, 25, 47, 0.8); 
+            color: #fff; 
+            transition: var(--transition-fast); 
+        }
+        .custom-input:focus { 
+            outline: none; 
+            border-color: var(--brand-primary); 
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3); 
+            background: rgba(10, 25, 47, 1);
+        }
+        
+        /* IMAGE Password Eye Toggle */
+        .eye-toggle {
+            position: absolute;
+            right: 18px;
+            top: 45px;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+            transition: 0.2s;
+        }
+        .eye-toggle:hover {
+            transform: scale(1.1);
+        }
+        .eye-toggle img {
+            width: 22px;
+            height: 22px;
+            filter: invert(1) brightness(0.9); /* Бяло/сиво око */
+        }
+
+        /* PERFECT Phone Input Styling */
+        .iti { width: 100%; display: block; }
+        .iti__flag-container { padding: 2px; z-index: 100; }
+        .iti input { padding-left: 52px !important; }
+        .iti__country-list {
+            background-color: var(--brand-dark) !important;
+            border: 1px solid var(--brand-primary) !important;
+            color: #fff !important;
+            border-radius: 12px !important;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.9) !important;
+            max-height: 250px !important;
+            width: 300px !important;
+            overflow-y: auto !important;
+            z-index: 99999 !important;
+        }
+        .iti__country { padding: 12px 15px !important; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .iti__country:hover { background-color: rgba(255, 215, 0, 0.2) !important; }
+        .iti__country-name { font-weight: 500; }
+        .iti__dial-code { color: var(--brand-primary); font-weight: bold; }
+        
+        .btn-main { 
+            width: 100%; 
+            padding: 18px; 
+            background: linear-gradient(135deg, var(--brand-primary), var(--brand-primary-hover)); 
+            color: #000; 
+            border: none; 
+            border-radius: 100px; 
+            font-size: 16px; 
+            font-weight: 900; 
+            text-transform: uppercase; 
+            cursor: pointer; 
+            transition: var(--transition-fast); 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            gap: 10px; 
+            box-shadow: 0 4px 20px rgba(255, 215, 0, 0.4); 
+            letter-spacing: 1px;
+            margin-top: 10px;
+        }
+        .btn-main:hover { 
+            transform: translateY(-3px); 
+            box-shadow: 0 8px 30px rgba(255, 215, 0, 0.6); 
+        }
+        .btn-main:active {
+            transform: translateY(1px);
+        }
+
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 25px;
+            background: rgba(10, 25, 47, 0.8);
+            border-radius: var(--radius-md);
+            padding: 5px;
+            border: 1px solid rgba(255, 215, 0, 0.1);
+        }
+        .auth-tab {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: 12px;
+            transition: 0.3s;
+        }
+        .auth-tab.active {
+            background: var(--brand-primary);
+            color: #000;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+        }
+
+        /* ==========================================================================
+           3. DASHBOARD & NAVIGATION
+           ========================================================================== */
+        #app-view { padding-bottom: 100px; min-height: 100vh; }
+        .app-header { 
+            background: var(--bg-card); 
+            backdrop-filter: blur(15px); 
+            padding: 16px 24px; 
+            border-bottom: 1px solid var(--border-light); 
+            position: sticky; 
+            top: 34px; 
+            z-index: 100; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+        }
+        .app-header-title { font-weight: 900; font-size: 20px; color: var(--brand-primary); letter-spacing: 0.5px; }
+        
+        .bottom-nav { 
+            position: fixed; 
+            bottom: 0; 
+            left: 0; 
+            right: 0; 
+            height: 80px; 
+            background: rgba(10, 25, 47, 0.98); 
+            backdrop-filter: blur(15px);
+            border-top: 1px solid var(--border-light); 
+            display: flex; 
+            justify-content: space-around; 
+            align-items: center; 
+            z-index: 1000; 
+            padding-bottom: env(safe-area-inset-bottom); 
+            box-shadow: 0 -5px 25px rgba(0,0,0,0.8);
+        }
+        .nav-item { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            color: var(--text-muted); 
+            cursor: pointer; 
+            width: 20%; 
+            height: 100%; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+        }
+        .nav-item svg { 
+            width: 24px; 
+            height: 24px; 
+            margin-bottom: 6px; 
+            transition: var(--transition-fast); 
+            fill: currentColor; 
+        }
+        .nav-item span { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+        .nav-item.active { color: var(--brand-primary); transform: translateY(-3px); }
+        .nav-item.active svg { filter: drop-shadow(0 0 10px var(--brand-primary)); }
+
+        /* ==========================================================================
+           4. WIDGETS & CARDS
+           ========================================================================== */
+        .tab-content { 
+            display: none; 
+            padding: 24px 20px; 
+            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); 
+            max-width: 650px; 
+            margin: 0 auto; 
+        }
+        .tab-content.active { display: block; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .balance-widget { 
+            background: linear-gradient(135deg, rgba(16, 33, 65, 0.95), rgba(10, 25, 47, 0.95)); 
+            border-radius: var(--radius-xl); 
+            padding: 35px 25px; 
+            text-align: center; 
+            box-shadow: var(--shadow-lg); 
+            margin-bottom: 24px; 
+            border: 1px solid var(--border-light); 
+            position: relative; 
+            overflow: hidden;
+        }
+        .balance-widget::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.15) 0%, transparent 60%);
+            animation: pulseGlow 4s infinite linear;
+            pointer-events: none;
+        }
+        @keyframes pulseGlow {
+            0% { transform: scale(0.95); opacity: 0.5; }
+            50% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.5; }
+        }
+
+        .balance-label { color: var(--text-muted); font-size: 14px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; position: relative; z-index: 1;}
+        .balance-amount { font-size: 52px; font-weight: 900; color: var(--brand-primary); text-shadow: 0 0 25px rgba(255, 215, 0, 0.4); margin: 12px 0; line-height: 1; position: relative; z-index: 1;}
+        
+        .status-badge { 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 8px; 
+            background: rgba(0, 230, 118, 0.15); 
+            color: var(--success); 
+            padding: 8px 16px; 
+            border-radius: 100px; 
+            font-size: 13px; 
+            font-weight: 800; 
+            border: 1px solid rgba(0, 230, 118, 0.4); 
+            position: relative;
+            z-index: 1;
+        }
+        .status-dot { width: 10px; height: 10px; background: var(--success); border-radius: 50%; box-shadow: 0 0 10px var(--success); animation: blink 1.5s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+        .card { 
+            background: var(--bg-card); 
+            backdrop-filter: blur(12px); 
+            border-radius: var(--radius-lg); 
+            padding: 24px; 
+            margin-bottom: 24px; 
+            border: 1px solid var(--border-light); 
+            box-shadow: var(--shadow-sm); 
+        }
+        .card-title { font-size: 18px; font-weight: 900; margin-bottom: 20px; color: var(--brand-primary); text-transform: uppercase; letter-spacing: 0.5px;}
+        
+        .btn-action { 
+            width: 100%; 
+            padding: 16px; 
+            border-radius: var(--radius-md); 
+            border: none; 
+            font-size: 15px; 
+            font-weight: 900; 
+            cursor: pointer; 
+            transition: var(--transition-fast); 
+            text-transform: uppercase; 
+            letter-spacing: 1px;
+        }
+        .btn-primary-action { background: var(--brand-primary); color: #000; box-shadow: 0 0 15px rgba(255, 215, 0, 0.4); }
+        .btn-primary-action:hover { background: var(--brand-primary-hover); transform: translateY(-2px); box-shadow: 0 5px 20px rgba(255, 215, 0, 0.6); }
+        .btn-secondary-action { background: rgba(255, 215, 0, 0.1); color: var(--brand-primary); border: 2px solid var(--brand-primary); }
+        .btn-secondary-action:hover { background: rgba(255, 215, 0, 0.2); transform: translateY(-2px); }
+
+        /* ==========================================================================
+           5. LISTS, TRANSACTIONS & MARKETS
+           ========================================================================== */
+        .search-bar-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        .search-bar { 
+            width: 100%; 
+            padding: 16px 20px 16px 45px; 
+            background: rgba(10, 25, 47, 0.8); 
+            border: 1px solid var(--border-light); 
+            border-radius: var(--radius-md); 
+            color: #fff; 
+            font-size: 16px; 
+        }
+        .search-bar:focus { outline: none; border-color: var(--brand-primary); box-shadow: 0 0 15px rgba(255, 215, 0, 0.3); }
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--brand-primary);
+            transition: 0.3s;
+            cursor: pointer;
+        }
+        .search-icon:hover { filter: drop-shadow(0 0 5px var(--brand-primary)); }
+
+        .list-item { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 16px; 
+            background: rgba(10, 25, 47, 0.6); 
+            border-radius: var(--radius-md); 
+            margin-bottom: 12px; 
+            border: 1px solid rgba(255, 215, 0, 0.1); 
+            transition: 0.3s; 
+            cursor: pointer;
+        }
+        .list-item:hover { border-color: var(--brand-primary); background: rgba(255, 215, 0, 0.1); transform: translateX(5px); }
+        .list-icon { width: 40px; height: 40px; border-radius: 50%; overflow: hidden; margin-right: 15px; background: #fff; padding: 2px; border: 2px solid var(--text-muted); }
+        .list-icon img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+        
+        .ai-holding-badge { 
+            background: rgba(255, 215, 0, 0.15); 
+            color: var(--brand-primary); 
+            font-size: 11px; 
+            padding: 4px 10px; 
+            border-radius: 8px; 
+            font-weight: 800; 
+            border: 1px solid rgba(255, 215, 0, 0.4); 
+            margin-top: 6px; 
+            display: inline-block; 
+            font-family: var(--font-mono);
+        }
+
+        .tx-item { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 15px 0; 
+            border-bottom: 1px solid rgba(255, 215, 0, 0.1); 
+        }
+        .tx-item:last-child { border-bottom: none; }
+        .tx-icon-wrapper {
+            width: 36px; height: 36px; border-radius: 12px; background: rgba(0, 230, 118, 0.15); 
+            display: flex; align-items: center; justify-content: center; margin-right: 12px; color: var(--success);
+        }
+
+        /* Chart */
+        .chart-container { 
+            background: rgba(10, 25, 47, 0.8); 
+            border-radius: var(--radius-md); 
+            padding: 15px; 
+            border: 1px solid var(--border-light); 
+            margin-bottom: 24px; 
+        }
+
+        /* ==========================================================================
+           6. LIVE BLOCKCHAIN
+           ========================================================================== */
+        .blockchain-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .blockchain-header h2 {
+            font-family: var(--font-mono);
+            font-size: 24px;
+            color: var(--success);
+            text-shadow: 0 0 15px rgba(0, 230, 118, 0.5);
+            margin-bottom: 5px;
+        }
+        .blockchain-feed {
+            background: #060B14;
+            border: 1px solid var(--success);
+            border-radius: var(--radius-md);
+            height: 400px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 0 20px rgba(0, 230, 118, 0.1), 0 0 15px rgba(0, 230, 118, 0.2);
+            padding: 10px;
+        }
+        .blockchain-feed::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0; height: 100px;
+            background: linear-gradient(to top, #060B14 0%, transparent 100%);
+            pointer-events: none;
+        }
+        .block-tx {
+            font-family: var(--font-mono);
+            background: rgba(0, 230, 118, 0.08);
+            border-left: 3px solid var(--success);
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            border-radius: 0 8px 8px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideDownFade 0.3s ease-out forwards;
+            font-size: 13px;
+        }
+        @keyframes slideDownFade {
+            0% { opacity: 0; transform: translateY(-20px); background: rgba(0, 230, 118, 0.4); }
+            100% { opacity: 1; transform: translateY(0); background: rgba(0, 230, 118, 0.08); }
+        }
+        .block-hash { color: var(--text-muted); font-size: 11px; margin-bottom: 4px; }
+        .block-user { color: #fff; font-weight: bold; font-size: 14px; }
+        .block-amount { color: var(--brand-primary); font-weight: bold; font-size: 15px; text-shadow: 0 0 5px rgba(255, 215, 0, 0.4); }
+        .block-time { color: var(--text-muted); font-size: 10px; }
+
+        /* ==========================================================================
+           7. MODALS, TOASTS & PROFILE
+           ========================================================================== */
+        .social-proof-toast { 
+            position: fixed; 
+            bottom: 95px; 
+            left: -100%; 
+            background: rgba(16, 33, 65, 0.95); 
+            border-left: 4px solid var(--brand-primary); 
+            color: #fff; 
+            padding: 14px 24px; 
+            border-radius: 0 var(--radius-md) var(--radius-md) 0; 
+            font-size: 14px; 
+            font-weight: 800; 
+            box-shadow: var(--shadow-lg); 
+            z-index: 999; 
+            transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55); 
+            backdrop-filter: blur(10px); 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+        }
+        .social-proof-toast.show { left: 0; }
+
+        .modal-overlay { 
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
+            background: rgba(0, 0, 0, 0.9); backdrop-filter: blur(8px); 
+            z-index: 2000; display: flex; align-items: flex-end; justify-content: center; 
+            opacity: 0; visibility: hidden; transition: 0.4s; 
+        }
+        .modal-overlay.open { opacity: 1; visibility: visible; }
+        .modal-content { 
+            background: var(--brand-dark); width: 100%; max-width: 600px; 
+            border-radius: var(--radius-xl) var(--radius-xl) 0 0; padding: 35px 25px; 
+            border-top: 3px solid var(--brand-primary); transform: translateY(100%); 
+            transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); max-height: 90vh; overflow-y: auto; 
+            box-shadow: 0 -10px 50px rgba(0,0,0,0.9);
+        }
+        .modal-overlay.open .modal-content { transform: translateY(0); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .modal-close { background: rgba(255,255,255,0.1); border: none; color: var(--brand-primary); width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 16px; font-weight: bold; display: flex; align-items: center; justify-content: center; transition: 0.2s;}
+        .modal-close:hover { background: rgba(255, 215, 0, 0.2); transform: rotate(90deg); }
+
+        #toast-container { position: fixed; top: 70px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 12px; width: 90%; max-width: 450px; }
+        .toast { 
+            background: rgba(16, 33, 65, 0.98); color: #fff; padding: 16px 24px; 
+            border: 1px solid var(--brand-primary); border-radius: var(--radius-md); 
+            font-size: 15px; font-weight: 700; box-shadow: 0 0 25px rgba(255, 215, 0, 0.3); 
+            animation: toastIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards, toastOut 0.4s ease 3.5s forwards; 
+            backdrop-filter: blur(10px);
+            display: flex; align-items: center; gap: 12px;
+        }
+        @keyframes toastIn { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes toastOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-30px); } }
+
+        /* Profile specific */
+        .profile-avatar { 
+            width: 90px; height: 90px; 
+            background: linear-gradient(135deg, var(--brand-primary), var(--brand-primary-hover)); 
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+            font-size: 36px; font-weight: 900; color: #000; margin: 0 auto 20px auto; 
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.5); 
+            border: 3px solid rgba(255,255,255,0.2);
+        }
+        .vip-badge { display: inline-block; padding: 6px 18px; border-radius: 20px; font-size: 13px; font-weight: 900; margin-bottom: 25px; letter-spacing: 1px; }
+        .vip-basic { background: rgba(16, 33, 65, 0.8); color: var(--text-muted); border: 1px solid var(--text-muted); }
+        .vip-gold { background: rgba(255, 215, 0, 0.15); color: var(--brand-primary); border: 1px solid var(--brand-primary); box-shadow: 0 0 20px rgba(255, 215, 0, 0.4); }
+        
+        .demo-btn {
+            background: linear-gradient(90deg, #9C27B0, #E91E63);
+            color: white;
+            border: none;
+            box-shadow: 0 0 20px rgba(233, 30, 99, 0.5);
+        }
+        .demo-btn:hover {
+            box-shadow: 0 0 30px rgba(233, 30, 99, 0.8);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="live-notification" class="social-proof-toast">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+        <span id="live-noti-text"></span>
+    </div>
+
+    <div class="ticker-wrap">
+        <div class="ticker" id="top-ticker">
+            <span style="margin-right: 50px;">BTC/EUR: €94,120.45 <span style="color:#00E676;">▲ 2.4%</span></span>
+            <span style="margin-right: 50px;">ETH/EUR: €3,120.12 <span style="color:#00E676;">▲ 1.8%</span></span>
+            <span style="margin-right: 50px;">BNB/EUR: €580.40 <span style="color:#00E676;">▲ 4.1%</span></span>
+            <span style="margin-right: 50px;">SOL/EUR: €192.45 <span style="color:#FF3D00;">▼ 0.5%</span></span>
+            <span style="margin-right: 50px;">XRP/EUR: €0.55 <span style="color:#00E676;">▲ 0.2%</span></span>
+            <span style="margin-right: 50px;">ADA/EUR: €0.41 <span style="color:#FF3D00;">▼ 1.1%</span></span>
+            <span style="margin-right: 50px;">DOGE/EUR: €0.15 <span style="color:#00E676;">▲ 8.5%</span></span>
+            <span style="margin-right: 50px;">BTC/EUR: €94,120.45 <span style="color:#00E676;">▲ 2.4%</span></span>
+            <span style="margin-right: 50px;">ETH/EUR: €3,120.12 <span style="color:#00E676;">▲ 1.8%</span></span>
+        </div>
+    </div>
+
+    <div id="auth-view">
+        <div class="auth-container">
+            <div class="auth-header">
+                <svg width="72" height="72" viewBox="0 0 24 24" fill="none" style="margin-bottom: 15px; filter: drop-shadow(0 0 15px var(--brand-primary));">
+                    <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="var(--brand-primary)"/>
+                    <path d="M2 17L12 22L22 17M2 12L12 17L22 12" stroke="var(--brand-primary)" stroke-width="2"/>
+                </svg>
+                <h1>Ai Trading Bot</h1>
+                <p style="color: var(--text-muted); font-weight: 700; font-size: 14px; letter-spacing: 1px; text-transform: uppercase;">Elite AI Trading Ecosystem</p>
+            </div>
+
+            <div class="auth-tabs">
+                <div class="auth-tab active" id="tab-login-btn" onclick="toggleAuthMode('login')">Login</div>
+                <div class="auth-tab" id="tab-register-btn" onclick="toggleAuthMode('register')">Register</div>
+            </div>
+
+            <form id="auth-form">
+                <div class="input-group">
+                    <label>Email Address</label>
+                    <input type="email" id="auth-email" class="custom-input" placeholder="Enter your email" required>
+                </div>
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" id="auth-password" class="custom-input" placeholder="Minimum 6 characters" required minlength="6">
+                    <div class="eye-toggle" data-target="auth-password" onclick="togglePasswordImage(this)">
+                        <img src="https://cdn-icons-png.flaticon.com/512/159/159078.png" alt="Show Password">
+                    </div>
+                </div>
+                
+                <div id="register-fields" class="hidden">
+                    <div class="input-group">
+                        <label>Full Name</label>
+                        <input type="text" id="auth-name" class="custom-input" placeholder="e.g., John Doe">
+                    </div>
+                    <div class="input-group" style="margin-bottom: 25px;">
+                        <label>Phone Number</label>
+                        <input type="tel" id="auth-phone" class="custom-input">
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn-main" id="btn-submit-auth">
+                    Login to Account
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--brand-dark)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </button>
+            </form>
+            <div class="text-center" style="margin-top: 25px;">
+                <span style="font-size: 11px; color: var(--text-muted); display: flex; align-items: center; justify-content: center; gap: 5px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    Secured with 256-bit SSL encryption
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div id="app-view" class="hidden">
+        
+        <header class="app-header">
+            <div class="flex items-center gap-3">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" style="filter: drop-shadow(0 0 8px rgba(255,215,0,0.8));">
+                    <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="var(--brand-primary)"/>
+                </svg>
+                <div class="app-header-title" id="header-title-text">Home</div>
+            </div>
+            <div class="flex items-center">
+                <span style="font-size: 11px; font-weight: 800; color: var(--success); border: 1px solid rgba(0,230,118,0.3); background: rgba(0,230,118,0.1); padding: 4px 10px; border-radius: 12px; letter-spacing: 0.5px;">SECURE NODE</span>
+            </div>
+        </header>
+
+        <main id="tab-home" class="tab-content active">
+            <div class="balance-widget" id="portfolio-widget">
+                <div class="balance-label">Total AI Portfolio</div>
+                <div class="balance-amount" id="ui-main-balance">€0.00</div>
+                <div class="status-badge" id="ai-status-indicator">
+                    <div class="status-dot"></div>
+                    <span id="ai-status-text">AI is Analyzing the market</span>
+                </div>
+                
+                <div style="margin-top: 30px; text-align: left;">
+                    <div class="flex justify-between" style="font-size: 12px; font-weight: 800; color: var(--text-muted); margin-bottom: 8px;">
+                        <span>Next Profit Cycle</span>
+                        <span id="ai-percent" style="color: var(--brand-primary);">82%</span>
+                    </div>
+                    <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; box-shadow: inset 0 0 5px rgba(0,0,0,0.5);">
+                        <div id="ai-progress-bar" style="width: 82%; height: 100%; background: linear-gradient(90deg, var(--brand-primary), var(--brand-primary-hover)); box-shadow: 0 0 15px var(--brand-primary); transition: width 1s linear;"></div>
+                    </div>
+                </div>
+
+                <div id="portfolio-actions" class="flex gap-2 mt-3" style="gap: 15px;">
+                    <button class="btn-action btn-primary-action" onclick="openModal('modal-deposit')">Deposit</button>
+                    <button class="btn-action btn-secondary-action" onclick="document.getElementById('withdraw-section').scrollIntoView({behavior: 'smooth'})">Withdraw</button>
+                </div>
+            </div>
+
+            <div class="card" id="withdraw-section">
+                <div class="card-title flex items-center justify-between">
+                    <span>Withdraw Funds</span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                </div>
+                <div class="flex justify-between items-center mb-3">
+                    <span style="color: var(--text-muted); font-size: 13px; font-weight: 600;">Available Balance:</span>
+                    <span style="font-size: 22px; font-weight: 900; color: var(--brand-primary);" id="home-wallet-balance">€0.00</span>
+                </div>
+                
+                <div class="input-group">
+                    <label>Withdrawal Address (USDT TRC20)</label>
+                    <input type="text" id="user-crypto-wallet" class="custom-input" placeholder="Paste crypto address here...">
+                </div>
+                <div class="input-group" style="margin-top: 15px;">
+                    <label>Withdrawal Amount (EUR)</label>
+                    <input type="number" id="wd-amount" class="custom-input" placeholder="Minimum 50 EUR" min="50">
+                </div>
+                
+                <button class="btn-action btn-primary-action mt-2" onclick="processWithdrawal()">Confirm Withdrawal</button>
+                <div style="font-size: 12px; color: var(--text-muted); text-align: center; margin-top: 15px;">Withdrawn funds arrive within 5-15 minutes.</div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Live Transactions</div>
+                <div id="ui-transactions">
+                    <div class="text-center" style="color: var(--text-muted); font-size: 14px; padding: 20px 0;">Analyzing market data...</div>
+                </div>
+            </div>
+        </main>
+
+        <main id="tab-analytics" class="tab-content">
+            <h2 style="font-size: 22px; font-weight: 900; color: var(--brand-primary); margin-bottom: 20px;">AI Growth Analysis</h2>
+            <div class="chart-container">
+                <canvas id="portfolioChart" height="250"></canvas>
+            </div>
+            <div class="card">
+                <div class="card-title">AI Performance</div>
+                <div class="flex justify-between border-b pb-2" style="border-bottom: 1px solid var(--border-light); margin-bottom: 12px; padding-bottom: 12px;">
+                    <span style="color: var(--text-muted); font-weight: 600;">Win Rate</span>
+                    <span class="font-bold text-success" style="color: var(--success); font-size: 16px;">94.2%</span>
+                </div>
+                <div class="flex justify-between border-b pb-2" style="border-bottom: 1px solid var(--border-light); margin-bottom: 12px; padding-bottom: 12px;">
+                    <span style="color: var(--text-muted); font-weight: 600;">Active Bot Nodes</span>
+                    <span class="font-bold" style="color: #fff; font-size: 16px;">14 Nodes</span>
+                </div>
+                <div class="flex justify-between">
+                    <span style="color: var(--text-muted); font-weight: 600;">Risk Level</span>
+                    <span class="font-bold" style="color: var(--brand-primary); font-size: 16px;">Low (Auto-Hedged)</span>
+                </div>
+            </div>
+        </main>
+
+        <main id="tab-markets" class="tab-content">
+            <h2 style="font-size: 22px; font-weight: 900; color: var(--brand-primary); margin-bottom: 20px;">Global Crypto Markets</h2>
+            <div class="search-bar-container">
+                <svg class="search-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" onclick="resetSearch()">
+                    <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" id="market-search" class="search-bar" placeholder="Search for a coin (e.g., Bitcoin)..." onkeyup="MarketAPI.filterMarkets()">
+            </div>
+            <div id="crypto-list-container">
+                <div style="text-align:center; padding:50px; color:var(--text-muted); font-size: 16px;">Connecting to exchanges...</div>
+            </div>
+        </main>
+
+        <main id="tab-blockchain" class="tab-content">
+            <div class="blockchain-header">
+                <h2>⚡ LIVE BLOCKCHAIN</h2>
+                <p style="font-size: 13px; color: var(--text-muted);">Real-time network transactions</p>
+            </div>
+            
+            <div class="blockchain-feed" id="blockchain-feed-container">
+                </div>
+        </main>
+
+        <main id="tab-profile" class="tab-content">
+            <div class="text-center mb-3">
+                <div class="profile-avatar" id="profile-initials">US</div>
+                <h2 style="font-size: 24px; font-weight: 900; color: #fff; margin-bottom: 8px;" id="profile-name">User</h2>
+                <div class="vip-badge vip-basic" id="profile-vip-badge">🛡️ BASIC TIER</div>
+            </div>
+
+            <div class="card" style="text-align: center; border-color: rgba(233, 30, 99, 0.5);">
+                <div style="font-size: 14px; font-weight: 800; color: #fff; margin-bottom: 15px;">Want to test the system?</div>
+                <button class="btn-action demo-btn" id="demo-btn-el" onclick="toggleDemoMode()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px; vertical-align: middle;"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                    Demo Version
+                </button>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Information & Security</div>
+                <div class="flex justify-between border-b pb-2" style="border-bottom: 1px solid var(--border-light); margin-bottom: 15px; padding-bottom: 15px;">
+                    <span style="color: var(--text-muted); font-weight: 600;">Email</span>
+                    <span class="font-bold" style="color: #fff; font-size: 14px;" id="profile-email">***@***.com</span>
+                </div>
+                <div class="flex justify-between border-b pb-2" style="border-bottom: 1px solid var(--border-light); margin-bottom: 25px; padding-bottom: 15px;">
+                    <span style="color: var(--text-muted); font-weight: 600;">UID</span>
+                    <span class="font-bold" style="color: var(--text-muted); font-family: var(--font-mono); font-size: 12px;" id="profile-uid">...</span>
+                </div>
+                <button class="btn-action mt-2" style="background: rgba(255,61,0,0.1); color: var(--danger); border: 1px solid rgba(255,61,0,0.3);" onclick="handleLogout()">
+                    Secure Logout
+                </button>
+            </div>
+        </main>
+
+        <nav class="bottom-nav">
+            <div class="nav-item active" onclick="switchTab('home', 'Home', this)">
+                <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                <span>Home</span>
+            </div>
+            <div class="nav-item" onclick="switchTab('analytics', 'Analytics', this)">
+                <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                <span>Analytics</span>
+            </div>
+            <div class="nav-item" onclick="switchTab('markets', 'Markets', this)">
+                <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <span>Markets</span>
+            </div>
+            <div class="nav-item" onclick="switchTab('blockchain', 'Live Blockchain', this)">
+                <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line><line x1="12" y1="10" x2="12" y2="14"></line></svg>
+                <span>Blockchain</span>
+            </div>
+            <div class="nav-item" onclick="switchTab('profile', 'Profile', this)">
+                <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                <span>Profile</span>
+            </div>
+        </nav>
+    </div>
+
+    <div id="modal-deposit" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 style="font-size: 22px; font-weight: 900; color: var(--brand-primary);">Deposit Funds</h2>
+                <button class="modal-close" onclick="closeModal('modal-deposit')">✕</button>
+            </div>
+            <div class="text-center">
+                <div style="background: #fff; padding: 15px; display: inline-block; border-radius: 20px; margin-bottom: 25px; box-shadow: 0 0 20px rgba(255,215,0,0.3);">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=0x412De5B79a293BD9b69338f938f578215AD88dDc" alt="QR Code" style="display: block; border-radius: 8px;">
+                </div>
+                <h3 style="font-size: 16px; font-weight: 800; color: #fff; margin-bottom: 12px;">Please send a minimum of 100 USD to the company's account.</h3>
+                <div style="background: rgba(10, 25, 47, 0.8); border: 1px dashed var(--brand-primary); padding: 16px; border-radius: var(--radius-md); font-family: var(--font-mono); font-size: 13px; color: var(--brand-primary); word-break: break-all; margin-bottom: 30px; cursor: pointer; transition: 0.2s;" onclick="copyToClipboard('0x412De5B79a293BD9b69338f938f578215AD88dDc', 'Address copied!')" onmouseover="this.style.background='rgba(255, 215, 0, 0.1)'" onmouseout="this.style.background='rgba(10, 25, 47, 0.8)'">
+                    0x412De5B79a293BD9b69338f938f578215AD88dDc
+                    <div style="font-size: 10px; color: var(--text-muted); margin-top: 8px; font-family: 'Inter', sans-serif;">Tap to copy</div>
+                </div>
+                <button class="btn-action btn-primary-action" onclick="confirmDeposit()">I have sent the funds</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-asset-chart" class="modal-overlay">
+        <div class="modal-content" style="padding: 25px 20px;">
+            <div class="modal-header" style="margin-bottom: 15px;">
+                <div class="flex items-center gap-2">
+                    <h2 id="chart-asset-name" style="font-size: 20px; font-weight: 900; color: #fff;">Bitcoin</h2>
+                    <span id="chart-asset-sym" style="font-size: 12px; color: var(--brand-primary); background: rgba(255,215,0,0.15); padding: 2px 8px; border-radius: 6px; font-weight: 800;">BTC</span>
+                </div>
+                <button class="modal-close" onclick="closeModal('modal-asset-chart')">✕</button>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <div style="font-size: 12px; color: var(--text-muted); font-weight: bold; text-transform: uppercase;">Live Price (EUR)</div>
+                <div id="chart-asset-price" style="font-size: 36px; font-weight: 900; font-family: var(--font-mono); color: var(--success);">€0.00</div>
+            </div>
+
+            <div class="chart-container" style="margin-bottom: 0;">
+                <canvas id="liveAssetChart" height="250"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+        import { getDatabase, ref, set, get, query, orderByChild, equalTo, onValue, push, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-database.js";
+
+        // FIREBASE Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBqJH2NjEJnRhQ0MKgCsAXUS-q5p4YPHaU",
+            authDomain: "criptobot7777.firebaseapp.com",
+            projectId: "criptobot7777",
+            databaseURL: "https://criptobot7777-default-rtdb.europe-west1.firebasedatabase.app",
+            storageBucket: "criptobot7777.firebasestorage.app",
+            messagingSenderId: "185401450310",
+            appId: "1:185401450310:web:ba330cce0e3bc8da75cf47"
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        const AppState = { 
+            user: { id: null, data: null }, 
+            marketData: [], 
+            currentChart: null,
+            assetChartInstance: null, 
+            fakeTxs: null, 
+            offlineCalculated: false,
+            authMode: 'login',
+            demoActive: false
+        };
+
+        // UI CONTROLLER
+        const UI = {
+            phoneInput: window.intlTelInput(document.querySelector("#auth-phone"), {
+                preferredCountries: ["gb", "us", "bg", "de"], separateDialCode: true,
+                utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+            }),
+
+            showToast(message, type = 'info') {
+                const container = document.getElementById('toast-container');
+                const toast = document.createElement('div');
+                toast.className = 'toast';
+                let icon = '';
+                if(type === 'success') icon = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>';
+                else if(type === 'error') icon = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>';
+                else icon = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--brand-primary)" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>';
+                
+                toast.innerHTML = `${icon} <span>${message}</span>`;
+                container.appendChild(toast);
+                setTimeout(() => { if(container.contains(toast)) toast.remove(); }, 3500);
+            },
+
+            showLiveNotification(msg) {
+                const noti = document.getElementById('live-notification');
+                document.getElementById('live-noti-text').innerText = msg;
+                noti.classList.add('show');
+                try {
+                    const audio = new Audio('https://actions.google.com/sounds/v1/cartoon/wood_plank_flick.ogg');
+                    audio.volume = 0.1;
+                    audio.play().catch(e=>{});
+                } catch(e) {}
+                setTimeout(() => { noti.classList.remove('show'); }, 4000);
+            },
+
+            switchTab(tabId, titleText, element) {
+                document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                document.getElementById(`tab-${tabId}`).classList.add('active');
+                if(element) element.classList.add('active');
+                document.getElementById('header-title-text').innerText = titleText;
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                
+                if(tabId === 'markets' && AppState.marketData.length === 0) MarketAPI.fetchLivePrices();
+                if(tabId === 'analytics') this.initChart();
+                if(tabId === 'blockchain') BlockchainEngine.start();
+                else BlockchainEngine.stop();
+            },
+
+            openModal(modalId) { document.getElementById(modalId).classList.add('open'); document.body.style.overflow='hidden'; },
+            closeModal(modalId) { document.getElementById(modalId).classList.remove('open'); document.body.style.overflow=''; },
+
+            updateUserInterface(userData) {
+                const eur = new Intl.NumberFormat('en-IE', { style: 'currency', currency: 'EUR' });
+                const bal = userData.balance || 0;
+                
+                document.getElementById('ui-main-balance').innerText = eur.format(bal);
+                document.getElementById('home-wallet-balance').innerText = eur.format(bal);
+                
+                const nameStr = userData.fullName || "User";
+                const names = nameStr.split(' ');
+                const initials = names.length > 1 ? names[0][0] + names[1][0] : names[0].substring(0,2);
+                document.getElementById('profile-initials').innerText = initials.toUpperCase();
+                document.getElementById('profile-name').innerText = nameStr;
+                document.getElementById('profile-email').innerText = userData.email || "-";
+                document.getElementById('profile-uid').innerText = AppState.user.id;
+                
+                const vipBadge = document.getElementById('profile-vip-badge');
+                if(bal >= 500) {
+                    vipBadge.className = 'vip-badge vip-gold';
+                    vipBadge.innerHTML = '👑 GOLD TIER';
+                } else {
+                    vipBadge.className = 'vip-badge vip-basic';
+                    vipBadge.innerHTML = '🛡️ BASIC TIER';
+                }
+
+                if(userData.cryptoAddress) {
+                    document.getElementById('user-crypto-wallet').value = userData.cryptoAddress;
+                }
+
+                if(bal > 0) {
+                    document.getElementById('ai-status-text').innerText = 'AI Trading Active';
+                    LiveTradingEngine.start();
+                }
+
+                this.renderTransactions(bal);
+            },
+
+            renderTransactions(balance) {
+                const txDiv = document.getElementById('ui-transactions');
+                if(!balance || balance === 0) {
+                    txDiv.innerHTML = '<div class="text-center" style="color: var(--text-muted); font-size: 14px; padding: 20px 0;">No active trades. Please deposit funds.</div>';
+                    return;
+                }
+                
+                if(!AppState.fakeTxs) {
+                    const coins = ["BTC", "ETH", "SOL", "BNB", "XRP"];
+                    AppState.fakeTxs = [];
+                    for(let i=0; i<4; i++) {
+                         const type = Math.random() > 0.5 ? "Sold" : "Bought";
+                         const coin = coins[Math.floor(Math.random()*coins.length)];
+                         // Make amounts realistic based on coins
+                         let amount = 0;
+                         if (coin === "BTC") amount = (Math.random() * 0.05 + 0.001).toFixed(6);
+                         else if (coin === "ETH") amount = (Math.random() * 0.5 + 0.01).toFixed(4);
+                         else amount = (Math.random() * 50 + 1).toFixed(2);
+                         
+                         const profit = (balance * (Math.random() * 0.003 + 0.001)).toFixed(2);
+                         AppState.fakeTxs.push({ type, coin, amount, profit, time: 2 + (i*5) }); 
+                    }
+                }
+
+                let html = '';
+                AppState.fakeTxs.forEach(tx => {
+                    const isBuy = tx.type === 'Bought';
+                    const icon = isBuy ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>' : '<svg viewBox="0 0 24 24" fill="none" stroke="var(--brand-primary)" stroke-width="2"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline><polyline points="17 18 23 18 23 12"></polyline></svg>';
+                    
+                    html += `
+                    <div class="tx-item">
+                        <div class="flex items-center">
+                            <div class="tx-icon-wrapper" style="${isBuy?'':'background:rgba(255, 215, 0, 0.1); color: var(--brand-primary);'}">
+                                ${icon}
+                            </div>
+                            <div>
+                                <div style="font-weight: 800; font-size: 15px; color: #fff;">AI ${isBuy ? 'Bought' : 'Sold'} ${tx.amount} ${tx.coin}</div>
+                                <div style="font-size: 12px; color: var(--text-muted);">${tx.time} minutes ago</div>
+                            </div>
+                        </div>
+                        <div style="color: var(--success); font-weight: 900; font-size: 15px;">+€${tx.profit}</div>
+                    </div>`;
+                });
+                
+                txDiv.innerHTML = html;
+            },
+
+            initChart() {
+                if(AppState.currentChart) return; 
+                const ctx = document.getElementById('portfolioChart').getContext('2d');
+                
+                const labels = ["Day 1", "Day 2", "Day 3", "Day 4", "Day 5", "Day 6", "Today"];
+                const dataPoints = [1000, 1050, 1040, 1120, 1180, 1160, 1250]; 
+
+                if(AppState.user.data && AppState.user.data.balance > 0) {
+                    let cur = AppState.user.data.balance;
+                    for(let i=6; i>=0; i--) {
+                        dataPoints[i] = cur;
+                        cur = cur * (1 - (Math.random() * 0.05)); 
+                    }
+                }
+
+                AppState.currentChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Value (€)',
+                            data: dataPoints,
+                            borderColor: '#FFD700',
+                            backgroundColor: 'rgba(255, 215, 0, 0.15)',
+                            borderWidth: 3,
+                            tension: 0.4,
+                            fill: true,
+                            pointBackgroundColor: '#fff',
+                            pointRadius: 5,
+                            pointBorderColor: '#FFD700',
+                            pointBorderWidth: 2
+                        }]
+                    },
+                    options: { 
+                        responsive: true, 
+                        plugins: { legend: { display: false } }, 
+                        scales: { 
+                            x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#A0B2C6', font: {family: 'Inter', weight: 'bold'} } }, 
+                            y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#A0B2C6', font: {family: 'Inter', weight: 'bold'} } } 
+                        } 
+                    }
+                });
+            }
+        };
+
+        // AUTH LOGIC
+        const AuthLogic = {
+            init() {
+                const storedUID = localStorage.getItem('criptobot_enterprise_uid');
+                if(storedUID) {
+                    AppState.user.id = storedUID;
+                    document.getElementById('auth-view').classList.add('hidden');
+                    document.getElementById('app-view').classList.remove('hidden');
+                    this.startRealtimeSync();
+                    SocialProofEngine.start();
+                }
+
+                document.getElementById('auth-form').addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const btn = document.getElementById('btn-submit-auth');
+                    
+                    const email = document.getElementById('auth-email').value.toLowerCase().trim();
+                    const password = document.getElementById('auth-password').value; 
+                    const name = document.getElementById('auth-name').value.trim();
+                    const phone = UI.phoneInput.getNumber() || "";
+
+                    btn.disabled = true; btn.innerHTML = 'Processing... <svg width="20" height="20" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="31.4" stroke-dashoffset="0"><animate attributeName="stroke-dashoffset" values="31.4;0" dur="1s" repeatCount="indefinite"/></circle></svg>';
+
+                    try {
+                        const usersRef = ref(db, 'users');
+                        const emailSnap = await get(query(usersRef, orderByChild('email'), equalTo(email)));
+
+                        if(AppState.authMode === 'login') {
+                            if (emailSnap.exists()) {
+                                const userData = Object.values(emailSnap.val())[0];
+                                const userUid = Object.keys(emailSnap.val())[0];
+                                if (userData.password === password) {
+                                    localStorage.setItem('criptobot_enterprise_uid', userUid);
+                                    window.location.reload();
+                                } else {
+                                    UI.showToast("Wrong password!", "error");
+                                    this.resetBtn(btn);
+                                }
+                            } else {
+                                UI.showToast("No account found with this email.", "error");
+                                this.resetBtn(btn);
+                            }
+                        } else {
+                            if (emailSnap.exists()) {
+                                UI.showToast("Email is already registered. Please log in.", "error");
+                                this.resetBtn(btn);
+                                return;
+                            }
+                            if(name.length < 3) {
+                                UI.showToast("Please enter your full name.", "error");
+                                this.resetBtn(btn);
+                                return;
+                            }
+
+                            let safeName = name.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
+                            if(!safeName) safeName = "User";
+                            const newId = safeName + "_" + Math.floor(10000 + Math.random() * 90000);
+                            
+                            await set(ref(db, `users/${newId}`), {
+                                fullName: name, email: email, phone: phone, password: password,
+                                cryptoAddress: "", balance: 0, lastSync: Date.now(), 
+                                createdAt: serverTimestamp()
+                            });
+                            
+                            localStorage.setItem('criptobot_enterprise_uid', newId);
+                            window.location.reload();
+                        }
+                    } catch(error) {
+                        UI.showToast("Server connection error.", "error");
+                        this.resetBtn(btn);
+                    }
+                });
+            },
+            
+            resetBtn(btn) {
+                btn.disabled = false; 
+                btn.innerHTML = AppState.authMode === 'login' ? 'Login to Account <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--brand-dark)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>' : 'Register <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--brand-dark)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>';
+            },
+
+            startRealtimeSync() {
+                onValue(ref(db, `users/${AppState.user.id}`), async (snapshot) => {
+                    const data = snapshot.val();
+                    if(data) { 
+                        AppState.user.data = data; 
+                        UI.updateUserInterface(data); 
+
+                        if (!AppState.offlineCalculated && data.balance > 0 && !AppState.demoActive) {
+                            AppState.offlineCalculated = true;
+                            const now = Date.now();
+                            const lastSync = data.lastSync || now;
+                            const missedMinutes = Math.floor((now - lastSync) / 60000);
+
+                            if (missedMinutes > 5 && missedMinutes < 525600) { 
+                                const estimatedProfit = data.balance * 0.0015 * missedMinutes; 
+                                await set(ref(db, `users/${AppState.user.id}/balance`), data.balance + estimatedProfit);
+                                await set(ref(db, `users/${AppState.user.id}/lastSync`), now);
+                                setTimeout(() => {
+                                    UI.showToast(`While you were offline, AI generated €${estimatedProfit.toFixed(2)} profit!`, 'success');
+                                }, 2500);
+                            }
+                        }
+                    }
+                });
+            }
+        };
+
+        // MARKET API
+        const MarketAPI = {
+            async fetchLivePrices() {
+                try {
+                    const res = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=eur&order=market_cap_desc&per_page=50&page=1&sparkline=false');
+                    if(!res.ok) return;
+                    
+                    let data = await res.json();
+                    
+                    data = data.map((coin, index) => {
+                        let aiHoldings = 0;
+                        // Realistic algorithm for AI holdings based on coin price
+                        if (index < 15 && Math.random() > 0.2) {
+                            // High price coins get smaller fractions, small coins get bigger numbers
+                            let multiplier = coin.current_price > 1000 ? 0.005 : (coin.current_price > 10 ? 0.5 : 50);
+                            aiHoldings = (Math.random() * multiplier + (multiplier*0.1)).toFixed(6);
+                        }
+                        return { ...coin, aiHoldings: aiHoldings };
+                    });
+
+                    AppState.marketData = data;
+                    this.renderMarkets(data);
+                } catch(e) {
+                    document.getElementById('crypto-list-container').innerHTML = '<div style="text-align:center; padding:50px; color:var(--danger);">Error loading data.</div>';
+                }
+            },
+
+            renderMarkets(data) {
+                let html = '';
+                data.forEach(coin => {
+                    const price = coin.current_price;
+                    const change = coin.price_change_percentage_24h || 0;
+                    const isPos = change >= 0;
+                    
+                    html += `
+                        <div class="list-item market-coin" data-name="${coin.name.toLowerCase()}" data-symbol="${coin.symbol.toLowerCase()}" onclick="openAssetChart('${coin.name}', '${coin.symbol.toUpperCase()}', ${price})">
+                            <div class="flex items-center">
+                                <div class="list-icon"><img src="${coin.image}" alt="${coin.symbol}"></div>
+                                <div>
+                                    <div style="font-weight: 800; font-size: 16px; color: #fff;">${coin.name}</div>
+                                    <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">${coin.symbol}</div>
+                                    ${coin.aiHoldings > 0 ? `<div class="ai-holding-badge">AI SECURED: ${coin.aiHoldings} ${coin.symbol.toUpperCase()}</div>` : ''}
+                                </div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-weight: 900; font-size: 16px; color: #fff;">€${price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 6})}</div>
+                                <div style="font-size: 13px; font-weight: 800; color: ${isPos ? 'var(--success)' : 'var(--danger)'};">${isPos?'+':''}${change.toFixed(2)}%</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                document.getElementById('crypto-list-container').innerHTML = html;
+            },
+
+            filterMarkets() {
+                const term = document.getElementById('market-search').value.toLowerCase();
+                const items = document.querySelectorAll('.market-coin');
+                items.forEach(item => {
+                    item.style.display = (item.dataset.name.includes(term) || item.dataset.symbol.includes(term)) ? 'flex' : 'none';
+                });
+            }
+        };
+
+        // BLOCKCHAIN ENGINE
+        const BlockchainEngine = {
+            intervalId: null,
+            names: [
+                "ivan_bay", "alex_crypto", "Maria99", "Trader_Pro", "dimitar_v", 
+                "Georgi_BG", "whale_77", "satoshi_nakamoto", "Elena_X", "Petar_D", 
+                "crypto_king", "anon_wallet", "Sofia_Hub", "JohnDoe", "0xGeniuS",
+                "stefan_trader", "nikola_btc", "varna_crypto", "binance_hot", "kucoin_user"
+            ],
+            coins: ["BTC", "ETH", "USDT", "SOL", "BNB", "XRP", "DOGE", "ADA"],
+            
+            start() {
+                if(this.intervalId) return;
+                const container = document.getElementById('blockchain-feed-container');
+                container.innerHTML = ''; 
+                
+                this.intervalId = setInterval(() => {
+                    const name = this.names[Math.floor(Math.random() * this.names.length)];
+                    const coin = this.coins[Math.floor(Math.random() * this.coins.length)];
+                    
+                    // Realistic blockchain amounts
+                    let amount = 0;
+                    if(coin === 'BTC') amount = (Math.random() * 0.5 + 0.001).toFixed(5);
+                    else if(coin === 'ETH') amount = (Math.random() * 5 + 0.05).toFixed(4);
+                    else amount = (Math.random() * 5000 + 10).toFixed(2);
+
+                    const hash = '0x' + Math.random().toString(16).substr(2, 12) + '...' + Math.random().toString(16).substr(2, 6);
+                    const now = new Date();
+                    const timeStr = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}`;
+
+                    const el = document.createElement('div');
+                    el.className = 'block-tx';
+                    el.innerHTML = `
+                        <div style="flex:1;">
+                            <div class="block-hash">${hash}</div>
+                            <div class="block-user">${name} <span style="color: var(--text-muted); font-size: 11px; font-weight:normal;">executed</span></div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div class="block-amount">${amount} ${coin}</div>
+                            <div class="block-time">${timeStr} • Confirmed</div>
+                        </div>
+                    `;
+                    container.prepend(el);
+                    
+                    if(container.children.length > 30) {
+                        container.lastChild.remove();
+                    }
+                }, 350);
+            },
+            
+            stop() {
+                if(this.intervalId) {
+                    clearInterval(this.intervalId);
+                    this.intervalId = null;
+                }
+            }
+        };
+
+        // AI ENGINE
+        const LiveTradingEngine = {
+            interval: null,
+            start() {
+                if(this.interval) return;
+                
+                let progress = 0;
+                setInterval(() => {
+                    progress += 2;
+                    if(progress > 100) progress = 0;
+                    document.getElementById('ai-percent').innerText = progress + '%';
+                    document.getElementById('ai-progress-bar').style.width = progress + '%';
+                }, 1000);
+
+                this.interval = setInterval(async () => {
+                    const u = AppState.user.data;
+                    if(!u || u.balance <= 0) return;
+                    
+                    const profitEuro = u.balance * ((Math.random() * 0.002) + 0.001);
+                    
+                    if(!AppState.demoActive) {
+                        try { 
+                            await set(ref(db, `users/${AppState.user.id}/balance`), u.balance + profitEuro); 
+                            await set(ref(db, `users/${AppState.user.id}/lastSync`), Date.now()); 
+                        } catch(err) {}
+                    } else {
+                        AppState.user.data.balance += profitEuro;
+                        UI.updateUserInterface(AppState.user.data);
+                    }
+                }, 60000); 
+            }
+        };
+
+        // SOCIAL PROOF ENGINE
+        const SocialProofEngine = {
+            fakes: [
+                "🇩🇪 Thomas M. just deposited €500",
+                "🇧🇬 Ivan G. withdrew €1,200 to Binance",
+                "🇬🇧 Sarah W. activated AI algorithm",
+                "🇮🇹 Marco P. reached Gold Tier",
+                "🇪🇸 Maria L. deposited €2,500",
+                "🇷🇴 Alex D. withdrew €850",
+                "🇺🇸 John D. registered a new node"
+            ],
+            start() {
+                setInterval(() => {
+                    const msg = this.fakes[Math.floor(Math.random() * this.fakes.length)];
+                    UI.showLiveNotification(msg);
+                }, 18000); 
+            }
+        };
+
+        // EXPORTS & GLOBAL FUNCTIONS
+        window.toggleAuthMode = (mode) => {
+            AppState.authMode = mode;
+            const loginBtn = document.getElementById('tab-login-btn');
+            const regBtn = document.getElementById('tab-register-btn');
+            const regFields = document.getElementById('register-fields');
+            const submitBtn = document.getElementById('btn-submit-auth');
+
+            if(mode === 'login') {
+                loginBtn.classList.add('active');
+                regBtn.classList.remove('active');
+                regFields.classList.add('hidden');
+                document.getElementById('auth-name').removeAttribute('required');
+                submitBtn.innerHTML = 'Login to Account <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--brand-dark)" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>';
+            } else {
+                regBtn.classList.add('active');
+                loginBtn.classList.remove('active');
+                regFields.classList.remove('hidden');
+                document.getElementById('auth-name').setAttribute('required', 'true');
+                submitBtn.innerHTML = 'Register <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--brand-dark)" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>';
+            }
+        };
+
+        window.togglePasswordImage = (el) => {
+            const input = document.getElementById(el.dataset.target);
+            const img = el.querySelector('img');
+            if (input.type === 'password') {
+                input.type = 'text';
+                img.src = "https://cdn-icons-png.flaticon.com/512/159/159077.png"; 
+            } else {
+                input.type = 'password';
+                img.src = "https://cdn-icons-png.flaticon.com/512/159/159078.png"; 
+            }
+        };
+
+        window.toggleDemoMode = () => {
+            AppState.demoActive = !AppState.demoActive;
+            const actions = document.getElementById('portfolio-actions');
+            const wdWidget = document.getElementById('withdraw-section');
+            const demoBtn = document.getElementById('demo-btn-el');
+
+            if(AppState.demoActive) {
+                // Скрива се само депозитната и теглещата част (портфейла), балансът остава!
+                actions.style.display = 'none';
+                wdWidget.style.display = 'none';
+                demoBtn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px; vertical-align: middle;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> Exit Demo Mode';
+                
+                AppState.user.data.balance = 1000.00;
+                UI.updateUserInterface(AppState.user.data);
+                
+                UI.showToast("Demo mode enabled! Portfolios hidden, Balance Active.", "success");
+                document.querySelectorAll('.nav-item')[0].click(); // Към Home
+            } else {
+                actions.style.display = 'flex';
+                wdWidget.style.display = 'block';
+                demoBtn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px; vertical-align: middle;"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> Demo Version';
+                
+                AuthLogic.startRealtimeSync(); 
+                
+                UI.showToast("Demo mode disabled! Returning to real account.", "info");
+                document.querySelectorAll('.nav-item')[0].click();
+            }
+        };
+
+        window.resetSearch = () => {
+            const input = document.getElementById('market-search');
+            input.value = '';
+            MarketAPI.filterMarkets();
+            input.focus();
+        };
+
+        window.openAssetChart = (name, symbol, price) => {
+            document.getElementById('chart-asset-name').innerText = name;
+            document.getElementById('chart-asset-sym').innerText = symbol;
+            document.getElementById('chart-asset-price').innerText = "€" + (price < 1 ? price.toFixed(6) : price.toLocaleString());
+            
+            UI.openModal('modal-asset-chart');
+            
+            // Generate simple visual chart
+            const ctx = document.getElementById('liveAssetChart').getContext('2d');
+            if(AppState.assetChartInstance) AppState.assetChartInstance.destroy();
+            
+            let pts = []; 
+            let cur = price * 0.95;
+            for(let i=0;i<20;i++){ pts.push(cur); cur = cur*(1+(Math.random()*0.06-0.025)); }
+            pts.push(price);
+            
+            AppState.assetChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: Array(21).fill(''),
+                    datasets: [{
+                        data: pts,
+                        borderColor: '#00E676',
+                        borderWidth: 3,
+                        pointRadius: 0,
+                        tension: 0.3,
+                        fill: true,
+                        backgroundColor: 'rgba(0, 230, 118, 0.1)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { display: false },
+                        y: { display: true, position: 'right', grid: { color: 'rgba(255,255,255,0.05)' } }
+                    }
+                }
+            });
+        };
+
+        window.processWithdrawal = async () => {
+            const amount = parseFloat(document.getElementById('wd-amount').value);
+            const userBal = AppState.user.data.balance || 0;
+            const wallet = document.getElementById('user-crypto-wallet').value || AppState.user.data.cryptoAddress;
+
+            if(!wallet || wallet.length < 15) return UI.showToast("Please enter a valid crypto address!", "error");
+            if(isNaN(amount) || amount < 50) return UI.showToast("Minimum withdrawal is €50.", "error");
+            if(amount > userBal) return UI.showToast("Insufficient funds.", "error");
+
+            if(AppState.demoActive) {
+                AppState.user.data.balance -= amount;
+                document.getElementById('wd-amount').value = '';
+                UI.updateUserInterface(AppState.user.data);
+                return UI.showToast("Demo withdrawal successful! (Simulation)", "success");
+            }
+
+            try {
+                if(wallet !== AppState.user.data.cryptoAddress) {
+                    await set(ref(db, `users/${AppState.user.id}/cryptoAddress`), wallet);
+                }
+                await push(ref(db, 'withdrawal_requests'), {
+                    userId: AppState.user.id, name: AppState.user.data.fullName, address: wallet, amountRequested: amount, timestamp: serverTimestamp()
+                });
+                await set(ref(db, `users/${AppState.user.id}/balance`), userBal - amount);
+                document.getElementById('wd-amount').value = '';
+                UI.showToast("Withdrawal request accepted and processing.", "success");
+            } catch (error) {
+                UI.showToast("Request error. Please try again.", "error");
+            }
+        };
+
+        window.switchTab = (id, title, el) => UI.switchTab(id, title, el);
+        window.openModal = (id) => UI.openModal(id);
+        window.closeModal = (id) => UI.closeModal(id);
+        window.handleLogout = () => { localStorage.removeItem('criptobot_enterprise_uid'); window.location.reload(); };
+        window.copyToClipboard = (txt, msg) => { navigator.clipboard.writeText(txt); UI.showToast(msg, "success"); };
+        window.confirmDeposit = () => { UI.closeModal('modal-deposit'); UI.showToast("Deposit is being processed by the blockchain network.", "success"); };
+
+        document.addEventListener('DOMContentLoaded', () => AuthLogic.init());
+    </script>
+</body>
+</html>
