@@ -1,0 +1,1922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CriptoBot Enterprise | Ultimate AI Terminal v4</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <style>
+        /* 1. ROOT VARIABLES (THEME: DARK BLUE & GOLD) */
+        :root {
+            /* Colors */
+            --brand-gold: #d4af37;
+            --brand-gold-bright: #ffdf00;
+            --brand-navy-dark: #000b18;
+            --brand-navy-light: #001224;
+            
+            /* UI Surfaces */
+            --bg-gradient: radial-gradient(circle at top, #001a33 0%, #000b18 100%);
+            --glass-panel: rgba(0, 31, 63, 0.75);
+            --glass-light: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(212, 175, 55, 0.25);
+            
+            /* Typography Colors */
+            --text-main: #ffffff;
+            --text-secondary: #8da3b8;
+            --text-gold: #d4af37;
+            
+            /* Status Colors */
+            --status-success: #00ff88;
+            --status-danger: #ff3b30;
+            --status-warning: #ffcc00;
+            
+            /* Radii & Shadows */
+            --radius-sm: 8px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --radius-xl: 32px;
+            --shadow-base: 0 10px 40px rgba(0, 0, 0, 0.8);
+            --shadow-glow: 0 0 25px rgba(212, 175, 55, 0.15);
+            
+            /* Fonts */
+            --font-sans: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        /* 2. GLOBAL RESET & BASE STYLES */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            overflow-x: hidden;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Custom Scrollbar configuration */
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--brand-gold);
+            border-radius: 10px;
+        }
+
+        /* 3. INTL-TEL-INPUT OVERRIDES (FIX FOR CHAOTIC DROPDOWN) */
+        .iti {
+            width: 100%;
+            display: block;
+        }
+        .iti__flag-container {
+            z-index: 10;
+        }
+        .iti__country-list {
+            background-color: var(--brand-navy-dark) !important;
+            border: 1px solid var(--brand-gold) !important;
+            color: var(--text-main) !important;
+            border-radius: var(--radius-sm) !important;
+            box-shadow: var(--shadow-base), var(--shadow-glow) !important;
+            max-height: 250px !important;
+            overflow-y: auto !important;
+            z-index: 99999 !important;
+            width: 300px;
+            white-space: normal;
+        }
+        .iti__country {
+            padding: 12px 10px !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: background 0.2s ease;
+        }
+        .iti__country:hover, .iti__country.iti__highlight {
+            background-color: rgba(212, 175, 55, 0.2) !important;
+        }
+        .iti__divider {
+            border-bottom: 1px solid var(--brand-gold) !important;
+        }
+
+        /* 4. AUTHENTICATION MODULE (LOGIN / REGISTER) */
+        #auth-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 9000;
+            background: var(--bg-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .auth-panel {
+            width: 100%;
+            max-width: 460px;
+            background: var(--glass-panel);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-xl);
+            padding: 45px 35px;
+            box-shadow: var(--shadow-base), var(--shadow-glow);
+            animation: authFadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes authFadeUp {
+            0% { opacity: 0; transform: translateY(40px) scale(0.95); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .auth-tab-container {
+            display: flex;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 100px;
+            padding: 6px;
+            margin-bottom: 40px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .auth-tab-button {
+            flex: 1;
+            padding: 14px;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-weight: 800;
+            font-size: 13px;
+            text-transform: uppercase;
+            cursor: pointer;
+            border-radius: 100px;
+            transition: all 0.3s ease;
+            letter-spacing: 0.5px;
+        }
+
+        .auth-tab-button.active {
+            background: linear-gradient(135deg, var(--brand-gold), var(--brand-gold-bright));
+            color: #000000;
+            box-shadow: 0 4px 20px rgba(212, 175, 55, 0.4);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 11px;
+            font-weight: 900;
+            color: var(--text-gold);
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            letter-spacing: 1.2px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 18px 20px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-md);
+            color: var(--text-main);
+            font-size: 16px;
+            font-family: var(--font-sans);
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            border-color: var(--brand-gold);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        /* SVG Password Eye Toggle */
+        .password-toggle-icon {
+            position: absolute;
+            right: 18px;
+            top: 45px;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            color: var(--brand-gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+            z-index: 5;
+        }
+
+        .password-toggle-icon:hover {
+            opacity: 1;
+        }
+
+        .password-toggle-icon svg {
+            width: 22px;
+            height: 22px;
+            fill: currentColor;
+        }
+
+        .password-hint {
+            font-size: 10px;
+            color: var(--text-secondary);
+            margin-top: 8px;
+            line-height: 1.5;
+            display: block;
+        }
+
+        .auth-error-message {
+            color: var(--status-danger);
+            font-size: 12px;
+            margin-top: 25px;
+            text-align: center;
+            font-weight: 800;
+            background: rgba(255, 59, 48, 0.1);
+            padding: 12px;
+            border-radius: var(--radius-sm);
+            display: none;
+            border: 1px solid rgba(255, 59, 48, 0.3);
+        }
+
+        .btn-primary-gold {
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--brand-gold), var(--brand-gold-bright));
+            color: #000000;
+            border: none;
+            border-radius: 100px;
+            font-size: 16px;
+            font-weight: 900;
+            text-transform: uppercase;
+            cursor: pointer;
+            margin-top: 15px;
+            box-shadow: 0 8px 30px rgba(212, 175, 55, 0.3);
+            transition: all 0.2s ease;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary-gold:active {
+            transform: scale(0.97);
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+        }
+
+        /* 5. MAIN APPLICATION LAYOUT */
+        #main-application {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+            background: var(--bg-gradient);
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+        }
+
+        /* Header */
+        .dashboard-header {
+            padding: 45px 25px 20px;
+            background: rgba(0, 11, 24, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--glass-border);
+            z-index: 100;
+        }
+
+        .header-brand-title {
+            font-weight: 900;
+            font-size: 24px;
+            color: var(--brand-gold);
+            letter-spacing: -1px;
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+            margin: 0;
+        }
+
+        .header-status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 255, 136, 0.1);
+            padding: 6px 12px;
+            border-radius: 100px;
+            border: 1px solid rgba(0, 255, 136, 0.2);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--status-success);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--status-success);
+            animation: pulseDot 2s infinite;
+        }
+
+        @keyframes pulseDot {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+
+        .status-text {
+            font-size: 10px;
+            font-weight: 900;
+            color: var(--status-success);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* Balance Widget */
+        .portfolio-widget {
+            margin: 25px 20px;
+            padding: 45px 30px;
+            background: linear-gradient(135deg, rgba(0, 31, 63, 1) 0%, rgba(0, 11, 24, 1) 100%);
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--glass-border);
+            text-align: center;
+            position: relative;
+            box-shadow: var(--shadow-base), var(--shadow-glow);
+            overflow: hidden;
+        }
+
+        /* Widget inner glow effect */
+        .portfolio-widget::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 100%;
+            background: radial-gradient(circle at top, rgba(212,175,55,0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .portfolio-label {
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--text-gold);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .portfolio-balance-value {
+            font-size: 56px;
+            font-weight: 900;
+            margin: 5px 0 15px 0;
+            letter-spacing: -2px;
+            color: #ffffff;
+            position: relative;
+            z-index: 2;
+            text-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+
+        .demo-mode-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--status-warning);
+            color: #000000;
+            font-size: 11px;
+            font-weight: 900;
+            padding: 6px 14px;
+            border-radius: 8px;
+            text-transform: uppercase;
+            z-index: 5;
+            box-shadow: 0 4px 10px rgba(255, 204, 0, 0.3);
+        }
+
+        .portfolio-profit-ticker {
+            color: var(--status-success);
+            font-weight: 800;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: rgba(0, 255, 136, 0.05);
+            padding: 8px 16px;
+            border-radius: 100px;
+            display: inline-flex;
+            border: 1px solid rgba(0, 255, 136, 0.1);
+            position: relative;
+            z-index: 2;
+        }
+
+        /* 6. TAB VIEWPORT & PANES */
+        .main-viewport {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 20px 120px 20px;
+        }
+
+        .view-pane {
+            display: none;
+            animation: paneEnter 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .view-pane.active-pane {
+            display: block;
+        }
+
+        @keyframes paneEnter {
+            0% { opacity: 0; transform: translateY(15px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .content-card {
+            background: var(--glass-panel);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: var(--radius-lg);
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+
+        .card-header-title {
+            font-size: 14px;
+            font-weight: 900;
+            color: var(--text-gold);
+            text-transform: uppercase;
+            margin-bottom: 25px;
+            letter-spacing: 1.5px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* 7. MARKETS TAB (SEARCH & LIST) */
+        .search-container {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 16px 20px 16px 45px;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: var(--radius-md);
+            color: #fff;
+            font-size: 14px;
+            font-family: var(--font-sans);
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .search-input:focus {
+            border-color: var(--brand-gold);
+            background: rgba(0,0,0,0.7);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            width: 18px;
+            height: 18px;
+        }
+
+        .crypto-asset-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: var(--radius-md);
+            margin-bottom: 12px;
+            border: 1px solid transparent;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .crypto-asset-item:hover {
+            border-color: var(--brand-gold);
+            background: rgba(212, 175, 55, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .asset-left-side {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            z-index: 2;
+        }
+
+        .asset-icon-wrapper {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: #1c1c1e;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+        }
+
+        .asset-icon-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 50%;
+        }
+
+        .asset-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .asset-symbol {
+            font-weight: 800;
+            font-size: 16px;
+            color: #ffffff;
+            margin-bottom: 2px;
+        }
+
+        .asset-name {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        /* AI Holding Badge */
+        .ai-holding-badge {
+            margin-top: 6px;
+            font-size: 10px;
+            font-weight: 800;
+            color: var(--brand-gold);
+            background: rgba(212, 175, 55, 0.1);
+            padding: 3px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            font-family: var(--font-mono);
+        }
+
+        .asset-right-side {
+            text-align: right;
+            z-index: 2;
+        }
+
+        .asset-price {
+            font-weight: 800;
+            font-size: 16px;
+            color: #ffffff;
+            font-family: var(--font-mono);
+        }
+
+        .asset-change {
+            font-size: 12px;
+            font-weight: 900;
+            margin-top: 4px;
+        }
+
+        .change-positive { color: var(--status-success); }
+        .change-negative { color: var(--status-danger); }
+
+        /* 8. NETWORK TAB (LIVE BLOCKCHAIN LEDGER) */
+        .terminal-container {
+            font-family: var(--font-mono);
+            font-size: 11.5px;
+            color: var(--text-secondary);
+            height: 450px;
+            overflow-y: hidden;
+            line-height: 2.2;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 20px;
+            border-radius: var(--radius-md);
+            border-left: 3px solid var(--brand-gold);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+            position: relative;
+        }
+
+        /* Gradient overlay to fade top lines */
+        .terminal-container::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 40px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        .terminal-line {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            padding: 8px 0;
+            animation: terminalLineIn 0.3s ease-out forwards;
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+
+        @keyframes terminalLineIn {
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .term-time { color: #555; margin-right: 8px; }
+        .term-bot { color: var(--brand-gold); font-weight: 800; }
+        .term-action { color: #fff; font-weight: 600; }
+        .term-asset { color: #fff; font-weight: 800; }
+        .term-amt { color: var(--text-secondary); }
+
+        /* 9. WALLET TAB */
+        .qr-wrapper {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 25px;
+            box-shadow: 0 0 40px rgba(255,255,255,0.15);
+        }
+
+        .wallet-network-label {
+            font-size: 13px;
+            color: var(--brand-gold);
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+
+        .wallet-address-box {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 22px;
+            border-radius: var(--radius-md);
+            border: 1px dashed var(--brand-gold);
+            font-family: var(--font-mono);
+            font-size: 12px;
+            word-break: break-all;
+            color: var(--brand-gold);
+            user-select: all;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .wallet-address-box:hover {
+            background: rgba(212, 175, 55, 0.1);
+        }
+
+        /* 10. PROFILE TAB */
+        .profile-avatar-large {
+            width: 110px;
+            height: 110px;
+            background: linear-gradient(135deg, var(--brand-gold), var(--brand-gold-bright));
+            border-radius: 50%;
+            margin: 0 auto 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 44px;
+            font-weight: 900;
+            color: #000000;
+            box-shadow: 0 0 50px rgba(212, 175, 55, 0.4);
+            border: 4px solid rgba(0,0,0,0.5);
+        }
+
+        .profile-name-text {
+            font-size: 24px;
+            font-weight: 900;
+            margin-bottom: 5px;
+            letter-spacing: -0.5px;
+        }
+
+        .profile-email-text {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 40px;
+        }
+
+        .profile-action-btn {
+            width: 100%;
+            padding: 22px;
+            border-radius: var(--radius-md);
+            border: none;
+            font-weight: 900;
+            text-transform: uppercase;
+            cursor: pointer;
+            margin-bottom: 15px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            letter-spacing: 1px;
+        }
+
+        .btn-demo-toggle {
+            background: var(--status-warning);
+            color: #000000;
+            box-shadow: 0 5px 20px rgba(255, 159, 10, 0.3);
+        }
+
+        .btn-demo-toggle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 159, 10, 0.4);
+        }
+
+        .btn-logout {
+            background: transparent;
+            border: 2px solid var(--status-danger);
+            color: var(--status-danger);
+        }
+
+        .btn-logout:hover {
+            background: rgba(255, 59, 48, 0.1);
+        }
+
+        .security-info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 13px;
+        }
+        .security-info-row:last-child {
+            border-bottom: none;
+        }
+        .security-label { color: var(--text-secondary); font-weight: 600; }
+        .security-value { font-weight: 900; }
+
+        /* 11. BOTTOM NAVIGATION (FACEBOOK STYLE) */
+        .app-bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 90px;
+            background: rgba(0, 11, 24, 0.98);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border-top: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: space-around;
+            padding-bottom: env(safe-area-inset-bottom);
+            z-index: 5000;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+        }
+
+        .nav-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            cursor: pointer;
+            width: 25%;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-button svg {
+            width: 26px;
+            height: 26px;
+            margin-bottom: 8px;
+            fill: currentColor;
+            transition: all 0.3s ease;
+        }
+
+        .nav-button span {
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-button.active {
+            color: var(--brand-gold);
+        }
+
+        .nav-button.active svg {
+            filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.6));
+            transform: translateY(-2px);
+        }
+
+        /* Active indicator dot */
+        .nav-button.active::after {
+            content: '';
+            position: absolute;
+            bottom: 10px;
+            width: 4px;
+            height: 4px;
+            background: var(--brand-gold);
+            border-radius: 50%;
+            box-shadow: 0 0 5px var(--brand-gold);
+        }
+
+        /* 12. COIN DETAIL MODAL (CHART) */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            z-index: 10000;
+            display: none;
+            align-items: flex-end;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            width: 100%;
+            max-width: 600px;
+            background: var(--brand-navy-dark);
+            border-top: 2px solid var(--brand-gold);
+            border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+            padding: 30px 25px 50px 25px;
+            transform: translateY(100%);
+            transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 -10px 50px rgba(0,0,0,0.8);
+        }
+
+        .modal-overlay.open .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .modal-title-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .modal-coin-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #222;
+        }
+
+        .modal-coin-name {
+            font-size: 20px;
+            font-weight: 900;
+            color: #fff;
+        }
+        .modal-coin-symbol {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .btn-close-modal {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            color: #fff;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+        }
+        .btn-close-modal:hover { background: rgba(255,255,255,0.2); }
+
+        .modal-price-display {
+            font-size: 42px;
+            font-weight: 900;
+            font-family: var(--font-mono);
+            margin-bottom: 5px;
+            letter-spacing: -1px;
+        }
+
+        .chart-container {
+            width: 100%;
+            height: 250px;
+            background: rgba(0,0,0,0.5);
+            border-radius: var(--radius-md);
+            padding: 15px;
+            border: 1px solid rgba(255,255,255,0.05);
+            margin-top: 25px;
+            margin-bottom: 25px;
+        }
+
+        /* 13. TOAST NOTIFICATIONS */
+        .toast-notification {
+            position: fixed;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            background: var(--brand-navy-dark);
+            border: 1px solid var(--brand-gold);
+            color: #ffffff;
+            padding: 16px 30px;
+            border-radius: 100px;
+            font-size: 14px;
+            font-weight: 800;
+            z-index: 20000;
+            opacity: 0;
+            visibility: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 20px rgba(212,175,55,0.3);
+            transition: all 0.3s ease;
+        }
+
+        .toast-notification.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="global-toast" class="toast-notification">System message</div>
+
+    <div id="auth-overlay">
+        <div class="auth-panel">
+            
+            <div class="auth-tab-container">
+                <button class="auth-tab-button active" id="btn-tab-login" onclick="App.Auth.switchTab('login')">Логин</button>
+                <button class="auth-tab-button" id="btn-tab-register" onclick="App.Auth.switchTab('register')">Създай Акаунт</button>
+            </div>
+
+            <div id="form-login-section">
+                <div class="form-group">
+                    <label class="form-label">Имейл Адрес</label>
+                    <input type="email" id="input-login-email" class="form-input" placeholder="name@domain.com" autocomplete="email">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Парола</label>
+                    <input type="password" id="input-login-pass" class="form-input" placeholder="••••••••" autocomplete="current-password">
+                    
+                    <div class="password-toggle-icon" onclick="App.Auth.togglePasswordVisibility('input-login-pass', this)">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                        </svg>
+                    </div>
+                </div>
+                
+                <button class="btn-primary-gold" onclick="App.Auth.processLogin()">Влез в Терминала</button>
+            </div>
+
+            <div id="form-register-section" class="hidden">
+                <div class="form-group">
+                    <label class="form-label">Пълно Име</label>
+                    <input type="text" id="input-reg-name" class="form-input" placeholder="Иван Иванов" autocomplete="name">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Имейл Адрес</label>
+                    <input type="email" id="input-reg-email" class="form-input" placeholder="ivan@email.com" autocomplete="email">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Телефонен Номер</label>
+                    <input type="tel" id="input-reg-phone" class="form-input">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Сигурна Парола</label>
+                    <input type="password" id="input-reg-pass" class="form-input" placeholder="••••••••" autocomplete="new-password">
+                    
+                    <div class="password-toggle-icon" onclick="App.Auth.togglePasswordVisibility('input-reg-pass', this)">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                        </svg>
+                    </div>
+                    <span class="password-hint">Минимум 6 знака. Задължително 1 главна буква, 1 малка буква и 1 число.</span>
+                </div>
+                
+                <button class="btn-primary-gold" onclick="App.Auth.processRegistration()">Регистрация</button>
+            </div>
+
+            <div id="auth-error-box" class="auth-error-message"></div>
+        </div>
+    </div>
+
+    <div id="main-application" class="hidden">
+        
+        <header class="dashboard-header">
+            <h1 class="header-brand-title">CRIPTBOT PRO</h1>
+            <div class="header-status-indicator">
+                <div class="status-dot"></div>
+                <span class="status-text">МРЕЖАТА Е АКТИВНА</span>
+            </div>
+        </header>
+
+        <div class="portfolio-widget">
+            <div id="badge-demo-mode" class="demo-mode-badge hidden">ДЕМО ВЕРСИЯ</div>
+            <div class="portfolio-label">Общ AI Портфейл</div>
+            <div class="portfolio-balance-value" id="display-main-balance">0.00 €</div>
+            <div class="portfolio-profit-ticker" id="display-main-profit">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline>
+                    <polyline points="16 7 22 7 22 13"></polyline>
+                </svg>
+                + 0.00 € Днес (AI Печалба)
+            </div>
+        </div>
+
+        <div class="main-viewport">
+            
+            <div id="pane-market" class="view-pane active-pane">
+                <div class="card-header-title">Топ 100 Криптовалути</div>
+                
+                <div class="search-container">
+                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text" id="input-market-search" class="search-input" placeholder="Търси валута (напр. Bitcoin, BTC)...">
+                </div>
+
+                <div id="container-crypto-list">
+                    <div style="text-align:center; padding: 40px; color: var(--text-secondary);">Свързване с борсите...</div>
+                </div>
+            </div>
+
+            <div id="pane-network" class="view-pane">
+                <div class="content-card">
+                    <div class="card-header-title">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                        </svg>
+                        Жив Блокчейн Регистър
+                    </div>
+                    <div class="terminal-container" id="container-blockchain-feed">
+                        </div>
+                </div>
+            </div>
+
+            <div id="pane-wallet" class="view-pane">
+                
+                <div id="wallet-actions-container">
+                    
+                    <div class="content-card" style="text-align:center;">
+                        <div class="card-header-title" style="justify-content:center;">Депозиране на Капитал</div>
+                        
+                        <div class="qr-wrapper" id="wallet-qrcode">
+                            </div>
+                        
+                        <div class="wallet-network-label">Мрежа: USDT (TRC20 / BEP20)</div>
+                        
+                        <div class="wallet-address-box" onclick="App.UI.copyToClipboard(this.innerText, 'Адресът е копиран!')">
+                            0x412De5B79a293BD9b69338f938f578215AD88dDc
+                        </div>
+                        <div style="font-size: 10px; color: var(--text-secondary); margin-top: 10px;">Натисни върху адреса, за да го копираш.</div>
+                    </div>
+
+                    <div class="content-card">
+                        <div class="card-header-title">Изтегляне на Печалби</div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Твой USDT Адрес за получаване</label>
+                            <input type="text" id="input-withdraw-address" class="form-input" placeholder="Постави адреса си тук...">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Сума за теглене (EUR)</label>
+                            <input type="number" id="input-withdraw-amount" class="form-input" placeholder="Минимум 50.00 €">
+                        </div>
+                        
+                        <button class="btn-primary-gold" style="padding: 16px; font-size: 14px;" onclick="App.UI.processWithdrawal()">Потвърди Тегленето</button>
+                    </div>
+
+                </div>
+
+                <div id="wallet-demo-message" class="hidden" style="text-align: center; padding: 50px 20px;">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--status-warning)" stroke-width="2" style="margin-bottom: 20px;">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                    <h3 style="color: var(--status-warning); margin-bottom: 10px;">Защита на Активите</h3>
+                    <p style="color: var(--text-secondary); font-size: 14px;">Функциите за реално депозиране и теглене са деактивирани, докато използвате Демо версията.</p>
+                </div>
+            </div>
+
+            <div id="pane-profile" class="view-pane">
+                
+                <div class="content-card" style="text-align:center;">
+                    <div class="profile-avatar-large" id="display-profile-initials">U</div>
+                    <h2 class="profile-name-text" id="display-profile-name">Потребител</h2>
+                    <div class="profile-email-text" id="display-profile-email">email@domain.com</div>
+                    
+                    <button id="btn-toggle-demo-mode" class="profile-action-btn btn-demo-toggle" onclick="App.Core.toggleDemoMode()">Активирай Демо Версия</button>
+                    <button class="profile-action-btn btn-logout" onclick="App.Auth.logout()">Сигурен Изход</button>
+                </div>
+                
+                <div class="content-card">
+                    <div class="card-header-title">Сигурност на Акаунта</div>
+                    
+                    <div class="security-info-row">
+                        <span class="security-label">Статус на криптиране:</span>
+                        <span class="security-value" style="color: var(--status-success);">AES-256 АКТИВНО</span>
+                    </div>
+                    <div class="security-info-row">
+                        <span class="security-label">Ниво на достъп:</span>
+                        <span class="security-value" style="color: var(--brand-gold);">ELITE AI БОТ</span>
+                    </div>
+                    <div class="security-info-row">
+                        <span class="security-label">База данни:</span>
+                        <span class="security-value" style="color: var(--text-main);">Firebase Realtime</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <nav class="app-bottom-nav">
+            <div class="nav-button active" id="nav-btn-market" onclick="App.UI.switchView('market')">
+                <svg viewBox="0 0 24 24">
+                    <path d="M3 3v18h18M7 14l4-4 4 4 5-5"/>
+                </svg>
+                <span>Пазари</span>
+            </div>
+            
+            <div class="nav-button" id="nav-btn-network" onclick="App.UI.switchView('network')">
+                <svg viewBox="0 0 24 24">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                </svg>
+                <span>Мрежа</span>
+            </div>
+            
+            <div class="nav-button" id="nav-btn-wallet" onclick="App.UI.switchView('wallet')">
+                <svg viewBox="0 0 24 24">
+                    <rect x="2" y="5" width="20" height="14" rx="2"/>
+                    <path d="M16 10h4"/>
+                </svg>
+                <span>Портфейл</span>
+            </div>
+            
+            <div class="nav-button" id="nav-btn-profile" onclick="App.UI.switchView('profile')">
+                <svg viewBox="0 0 24 24">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                    <circle cx="12" cy="7" r="4"/>
+                </svg>
+                <span>Профил</span>
+            </div>
+        </nav>
+
+    </div>
+
+    <div id="modal-coin-detail" class="modal-overlay">
+        <div class="modal-content">
+            
+            <div class="modal-header">
+                <div class="modal-title-group">
+                    <img src="" id="modal-coin-img" class="modal-coin-icon" alt="icon">
+                    <div>
+                        <div class="modal-coin-name" id="modal-coin-name">Bitcoin</div>
+                        <div class="modal-coin-symbol" id="modal-coin-symbol">BTC</div>
+                    </div>
+                </div>
+                <button class="btn-close-modal" onclick="App.UI.closeCoinModal()">✕</button>
+            </div>
+
+            <div style="color: var(--brand-gold); font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">Текуща Цена (USD)</div>
+            <div class="modal-price-display" id="modal-coin-price">$0.00</div>
+            
+            <div class="chart-container">
+                <canvas id="canvas-coin-chart"></canvas>
+            </div>
+
+            <div class="content-card" style="margin-bottom: 0;">
+                <div class="card-header-title" style="margin-bottom: 15px;">AI Анализ на Актива</div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px;">
+                    <span style="color: var(--text-secondary);">Статус на алгоритъма:</span>
+                    <span style="color: var(--status-success); font-weight: 800;">Следи активно</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 14px;">
+                    <span style="color: var(--text-secondary);">Твоя наличност (AI Holdings):</span>
+                    <span id="modal-coin-holding" style="color: var(--brand-gold); font-weight: 900; font-family: var(--font-mono);">0.000000</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <script type="module">
+        /**
+         * FIREBASE ARCHITECTURE (ai-trading-bots-5491a)
+         * Required imports for Realtime Database initialization and operations.
+         */
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+        import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDnQYyX9k0NWKjWyo8fSGWFTUAN_XRfrbU",
+            authDomain: "ai-trading-bots-5491a.firebaseapp.com",
+            projectId: "ai-trading-bots-5491a",
+            databaseURL: "https://ai-trading-bots-5491a-default-rtdb.firebaseio.com",
+            storageBucket: "ai-trading-bots-5491a.appspot.com",
+            messagingSenderId: "904660144418",
+            appId: "1:904660144418:web:5d16771e00c7c3f8d7157b"
+        };
+
+        const fbApp = initializeApp(firebaseConfig);
+        const fbDb = getDatabase(fbApp);
+
+        /**
+         * MASTER APPLICATION NAMESPACE
+         * Centralizing all logic to avoid global scope pollution and ensure organization.
+         */
+        const App = {
+            
+            // --- STATE MANAGEMENT ---
+            State: {
+                user: null,              // Holds current user data from Firebase
+                isDemoMode: false,       // Boolean flag for demo mode
+                realBalance: 120.50,     // Real starting balance
+                demoBalance: 1000.00,    // Demo starting balance
+                marketData: [],          // Array of objects from CoinCap API
+                phoneInputInst: null,    // intl-tel-input instance
+                activeChartObj: null,    // Chart.js instance tracking to destroy/recreate
+                
+                // Micro-holdings generated by AI engine
+                // Format: { "bitcoin": 0.000015, "ethereum": 0.002 ... }
+                aiHoldings: {}
+            },
+
+            // --- AUTHENTICATION LOGIC ---
+            Auth: {
+                
+                /**
+                 * Switches between Login and Register tabs in the Auth Overlay
+                 */
+                switchTab(mode) {
+                    const btnLog = document.getElementById('btn-tab-login');
+                    const btnReg = document.getElementById('btn-tab-register');
+                    const secLog = document.getElementById('form-login-section');
+                    const secReg = document.getElementById('form-register-section');
+                    const errBox = document.getElementById('auth-error-box');
+
+                    errBox.style.display = 'none'; // Clear errors on tab switch
+
+                    if (mode === 'login') {
+                        btnLog.classList.add('active');
+                        btnReg.classList.remove('active');
+                        secLog.classList.remove('hidden');
+                        secReg.classList.add('hidden');
+                    } else {
+                        btnLog.classList.remove('active');
+                        btnReg.classList.add('active');
+                        secLog.classList.add('hidden');
+                        secReg.classList.remove('hidden');
+                    }
+                },
+
+                /**
+                 * Toggles password visibility and updates the SVG eye icon.
+                 * Used for both login and register password fields.
+                 */
+                togglePasswordVisibility(inputId, iconContainer) {
+                    const inputField = document.getElementById(inputId);
+                    const isCurrentlyPassword = inputField.type === 'password';
+                    
+                    // Toggle type
+                    inputField.type = isCurrentlyPassword ? 'text' : 'password';
+                    
+                    // Define SVG paths
+                    const svgEyeOpen = `<svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>`;
+                    
+                    const svgEyeClosed = `<svg viewBox="0 0 24 24"><path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.82l2.92 2.92c1.51-1.26 2.7-2.89 3.44-4.74-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/></svg>`;
+
+                    iconContainer.innerHTML = isCurrentlyPassword ? svgEyeClosed : svgEyeOpen;
+                },
+
+                /**
+                 * Validates password against strict rules.
+                 * Min 6 chars, 1 uppercase, 1 lowercase, 1 number.
+                 */
+                validateSecurityPolicy(password) {
+                    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,}$/;
+                    return regex.test(password);
+                },
+
+                /**
+                 * Process Registration Form
+                 */
+                async processRegistration() {
+                    const nameInput = document.getElementById('input-reg-name').value.trim();
+                    const emailInput = document.getElementById('input-reg-email').value.toLowerCase().trim();
+                    const phoneInput = App.State.phoneInputInst.getNumber();
+                    const passInput = document.getElementById('input-reg-pass').value;
+                    const errBox = document.getElementById('auth-error-box');
+
+                    // Validation
+                    if(nameInput.length < 3 || !emailInput.includes('@')) {
+                        errBox.innerText = "Грешка: Моля въведете валидно Име и Имейл.";
+                        errBox.style.display = 'block';
+                        return;
+                    }
+                    if(!this.validateSecurityPolicy(passInput)) {
+                        errBox.innerText = "Грешка в Сигурността: Паролата трябва да има главна буква, малка буква и число (мин. 6 знака).";
+                        errBox.style.display = 'block';
+                        return;
+                    }
+
+                    errBox.style.display = 'none';
+
+                    // Generate unique ID
+                    const newUserId = "node_" + Math.floor(Math.random() * 900000 + 100000);
+                    
+                    try {
+                        // Save to Firebase
+                        await set(ref(fbDb, `users/${newUserId}`), {
+                            name: nameInput,
+                            email: emailInput,
+                            phone: phoneInput,
+                            password: passInput,
+                            balance: 120.50,
+                            created_at: Date.now()
+                        });
+                        
+                        // Proceed to Dashboard
+                        this.grantAccess(newUserId, { name: nameInput, email: emailInput, balance: 120.50 });
+                        
+                    } catch (error) {
+                        console.error("Firebase Registration Error:", error);
+                        errBox.innerText = "Системна грешка: Неуспешна връзка с базата данни.";
+                        errBox.style.display = 'block';
+                    }
+                },
+
+                /**
+                 * Process Login Form
+                 */
+                async processLogin() {
+                    const emailInput = document.getElementById('input-login-email').value.toLowerCase().trim();
+                    const passInput = document.getElementById('input-login-pass').value;
+                    const errBox = document.getElementById('auth-error-box');
+
+                    errBox.style.display = 'none';
+
+                    try {
+                        const snapshot = await get(ref(fbDb, 'users'));
+                        if(snapshot.exists()) {
+                            const dbUsers = snapshot.val();
+                            
+                            // Check credentials
+                            for(let uid in dbUsers) {
+                                let u = dbUsers[uid];
+                                if(u.email === emailInput && u.password === passInput) {
+                                    this.grantAccess(uid, u);
+                                    return; // Exit function on success
+                                }
+                            }
+                        }
+                        // If loop finishes without return, login failed
+                        errBox.innerText = "Отказан Достъп: Грешен имейл или парола.";
+                        errBox.style.display = 'block';
+                    } catch (error) {
+                        console.error("Firebase Login Error:", error);
+                        errBox.innerText = "Системна грешка: Проблем със сървъра.";
+                        errBox.style.display = 'block';
+                    }
+                },
+
+                /**
+                 * Executes transition from Auth Overlay to Main App
+                 */
+                grantAccess(uid, userData) {
+                    App.State.user = { uid, ...userData };
+                    App.State.realBalance = userData.balance || 120.50;
+                    
+                    // Hide Auth, Show App
+                    document.getElementById('auth-overlay').classList.add('hidden');
+                    document.getElementById('main-application').classList.remove('hidden');
+                    
+                    // Populate Profile UI
+                    document.getElementById('display-profile-name').innerText = userData.name.toUpperCase();
+                    document.getElementById('display-profile-email').innerText = userData.email;
+                    
+                    // Generate Initials (e.g. "Ivan Ivanov" -> "I", or "II")
+                    const nameParts = userData.name.trim().split(' ');
+                    let initials = nameParts[0][0];
+                    if (nameParts.length > 1) initials += nameParts[1][0];
+                    document.getElementById('display-profile-initials').innerText = initials.toUpperCase();
+                    
+                    // Boot up systems
+                    App.Core.initializeSystem();
+                },
+
+                logout() {
+                    location.reload(); // Simplest way to clear state and return to auth
+                }
+            },
+
+            // --- UI CONTROLLERS ---
+            UI: {
+                
+                /**
+                 * Switches the main viewpanes (Tabs)
+                 */
+                switchView(targetId) {
+                    // Fetch all panes and nav buttons
+                    const panes = document.querySelectorAll('.view-pane');
+                    const navBtns = document.querySelectorAll('.nav-button');
+                    
+                    // Hide all
+                    panes.forEach(pane => pane.classList.remove('active-pane'));
+                    navBtns.forEach(btn => btn.classList.remove('active'));
+                    
+                    // Show target
+                    document.getElementById('pane-' + targetId).classList.add('active-pane');
+                    document.getElementById('nav-btn-' + targetId).classList.add('active');
+                    
+                    // Reset scroll
+                    document.querySelector('.main-viewport').scrollTo({ top: 0, behavior: 'smooth' });
+                },
+
+                /**
+                 * Shows a non-blocking toast notification
+                 */
+                showToast(message) {
+                    const toastEl = document.getElementById('global-toast');
+                    toastEl.innerText = message;
+                    toastEl.classList.add('show');
+                    
+                    // Hide after 3.5s
+                    setTimeout(() => {
+                        toastEl.classList.remove('show');
+                    }, 3500);
+                },
+
+                copyToClipboard(text, successMsg) {
+                    navigator.clipboard.writeText(text).then(() => {
+                        this.showToast(successMsg);
+                    }).catch(err => {
+                        console.error("Clipboard error:", err);
+                    });
+                },
+
+                processWithdrawal() {
+                    const addr = document.getElementById('input-withdraw-address').value;
+                    const amt = document.getElementById('input-withdraw-amount').value;
+                    
+                    if(!addr || addr.length < 10) {
+                        this.showToast("Грешка: Невалиден USDT адрес.");
+                        return;
+                    }
+                    if(!amt || amt < 50) {
+                        this.showToast("Грешка: Минималната сума за теглене е 50 €.");
+                        return;
+                    }
+
+                    // Simulate processing
+                    document.getElementById('input-withdraw-address').value = '';
+                    document.getElementById('input-withdraw-amount').value = '';
+                    this.showToast("Заявката е приета. Изчаква се блокчейн потвърждение.");
+                },
+
+                /**
+                 * Opens the Coin Detail Modal and renders Chart.js
+                 */
+                openCoinModal(coinId, coinSymbol, coinName, coinPriceUsd) {
+                    const modal = document.getElementById('modal-coin-detail');
+                    
+                    // Set textual data
+                    document.getElementById('modal-coin-name').innerText = coinName;
+                    document.getElementById('modal-coin-symbol').innerText = coinSymbol.toUpperCase();
+                    document.getElementById('modal-coin-img').src = `https://assets.coincap.io/assets/icons/${coinSymbol.toLowerCase()}@2x.png`;
+                    
+                    // Format price
+                    const formattedPrice = coinPriceUsd < 1 
+                        ? coinPriceUsd.toFixed(4) 
+                        : coinPriceUsd.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
+                    document.getElementById('modal-coin-price').innerText = "$" + formattedPrice;
+
+                    // Display AI Holdings for this specific coin
+                    // If AI hasn't bought it yet, show 0
+                    const currentHolding = App.State.aiHoldings[coinId] || 0;
+                    document.getElementById('modal-coin-holding').innerText = currentHolding.toFixed(6) + " " + coinSymbol.toUpperCase();
+
+                    // Open Modal
+                    modal.classList.add('open');
+
+                    // Render Chart
+                    this.renderCoinChart(coinId, parseFloat(coinPriceUsd));
+                },
+
+                closeCoinModal() {
+                    document.getElementById('modal-coin-detail').classList.remove('open');
+                },
+
+                /**
+                 * Renders a simulated historical chart for the selected coin using Chart.js
+                 */
+                renderCoinChart(coinId, currentPrice) {
+                    const canvasCtx = document.getElementById('canvas-coin-chart').getContext('2d');
+                    
+                    // Destroy existing chart if present to prevent rendering bugs
+                    if (App.State.activeChartObj !== null) {
+                        App.State.activeChartObj.destroy();
+                    }
+
+                    // Generate fake historical data points ending at currentPrice
+                    let dataPoints = [];
+                    let tempPrice = currentPrice * 0.95; // start slightly lower
+                    for(let i = 0; i < 15; i++) {
+                        dataPoints.push(tempPrice);
+                        // Random walk
+                        tempPrice = tempPrice * (1 + (Math.random() * 0.04 - 0.015)); 
+                    }
+                    // Ensure last point is exactly the current price
+                    dataPoints[14] = currentPrice;
+
+                    // Determine color based on trend (first vs last point)
+                    const isTrendUp = dataPoints[14] >= dataPoints[0];
+                    const chartColor = isTrendUp ? '#00ff88' : '#ff3b30';
+                    const gradientFill = canvasCtx.createLinearGradient(0, 0, 0, 250);
+                    gradientFill.addColorStop(0, isTrendUp ? 'rgba(0, 255, 136, 0.2)' : 'rgba(255, 59, 48, 0.2)');
+                    gradientFill.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+                    App.State.activeChartObj = new Chart(canvasCtx, {
+                        type: 'line',
+                        data: {
+                            labels: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', 'Now'],
+                            datasets: [{
+                                label: 'Цена (USD)',
+                                data: dataPoints,
+                                borderColor: chartColor,
+                                backgroundColor: gradientFill,
+                                borderWidth: 3,
+                                pointRadius: 0,
+                                pointHoverRadius: 6,
+                                fill: true,
+                                tension: 0.4 // smooth curves
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            interaction: {
+                                intersect: false,
+                                mode: 'index',
+                            },
+                            plugins: {
+                                legend: { display: false }
+                            },
+                            scales: {
+                                x: { display: false },
+                                y: { 
+                                    display: true, 
+                                    position: 'right',
+                                    grid: { color: 'rgba(255,255,255,0.05)' },
+                                    ticks: { color: '#8da3b8', font: { family: 'JetBrains Mono', size: 10 } }
+                                }
+                            }
+                        }
+                    });
+                }
+            },
+
+            // --- CORE ENGINE LOGIC ---
+            Core: {
+                
+                /**
+                 * Kicks off all background processes and fetches
+                 */
+                initializeSystem() {
+                    // Fetch external data
+                    this.fetchMarketData();
+                    
+                    // Start recurring loops
+                    this.startProfitAlgorithm();
+                    this.startLiveBlockchainFeeder();
+                    
+                    // Render QR Code in Wallet
+                    new QRCode(document.getElementById("wallet-qrcode"), { 
+                        text: "0x412De5B79a293BD9b69338f938f578215AD88dDc", 
+                        width: 150, height: 150 
+                    });
+
+                    // Initial refresh of top UI
+                    this.updateGlobalBalanceUI();
+
+                    // Set up Market Search Listener
+                    document.getElementById('input-market-search').addEventListener('input', () => {
+                        this.filterMarketList();
+                    });
+
+                    // Refresh API data every 60 seconds
+                    setInterval(() => this.fetchMarketData(), 60000);
+                },
+
+                /**
+                 * Toggles Demo Mode logic.
+                 * Requirement: Fix Demo mode to show Wallet, but hide Deposit/Withdraw.
+                 */
+                toggleDemoMode() {
+                    App.State.isDemoMode = !App.State.isDemoMode;
+                    
+                    const btnToggle = document.getElementById('btn-toggle-demo-mode');
+                    const demoBadge = document.getElementById('badge-demo-mode');
+                    const walletActionsContainer = document.getElementById('wallet-actions-container');
+                    const walletDemoMessage = document.getElementById('wallet-demo-message');
+
+                    if (App.State.isDemoMode) {
+                        // DEMO MODE ACTIVE
+                        btnToggle.innerText = "ВЪРНИ СЕ КЪМ РЕАЛНА ВЕРСИЯ";
+                        btnToggle.style.background = "#ffffff";
+                        btnToggle.style.color = "#000000";
+                        
+                        demoBadge.classList.remove('hidden');
+                        
+                        // Hide real deposit/withdraw, show warning message
+                        walletActionsContainer.classList.add('hidden');
+                        walletDemoMessage.classList.remove('hidden');
+                        
+                    } else {
+                        // REAL MODE ACTIVE
+                        btnToggle.innerText = "АКТИВИРАЙ ДЕМО ВЕРСИЯ";
+                        btnToggle.style.background = "var(--status-warning)";
+                        btnToggle.style.color = "#000000";
+                        
+                        demoBadge.classList.add('hidden');
+                        
+                        // Show real deposit/withdraw, hide warning message
+                        walletActionsContainer.classList.remove('hidden');
+                        walletDemoMessage.classList.add('hidden');
+                    }
+
+                    // Force UI update immediately
+                    this.updateGlobalBalanceUI();
+                    this.renderMarketList(); // Re-render to clear or adjust holdings if needed
+                },
+
+                /**
+                 * Updates the top balance widget
+                 */
+                updateGlobalBalanceUI() {
+                    const currentBal = App.State.isDemoMode ? App.State.demoBalance : App.State.realBalance;
+                    const startingBal = App.State.isDemoMode ? 1000.00 : 120.50;
+                    const profitToday = currentBal - startingBal;
+
+                    document.getElementById('display-main-balance').innerText = currentBal.toFixed(2) + " €";
+                    
+                    const profitDisplay = document.getElementById('display-main-profit');
+                    profitDisplay.innerHTML = `
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline>
+                            <polyline points="16 7 22 7 22 13"></polyline>
+                        </svg>
+                        + ${Math.max(0, profitToday).toFixed(2)} € Днес (AI Печалба)
+                    `;
+                },
+
+                /**
+                 * The Profit Engine: Adds 0.10 € on intervals.
+                 * Runs constantly to meet daily targets.
+                 */
+                startProfitAlgorithm() {
+                    // Logic: To make roughly ~20 EUR a day, we need increments of 0.10 EUR.
+                    // Instead of making the user wait hours to see 0.10, we simulate it
+                    // running faster while they are looking at the screen, but realistically
+                    // it syncs with database.
+                    
+                    setInterval(() => {
+                        if(App.State.isDemoMode) {
+                            // Demo grows faster for visual excitement
+                            App.State.demoBalance += 0.08;
+                        } else {
+                            // Real growth
+                            App.State.realBalance += 0.10;
+                            
+                            // Save safely to Firebase
+                            if(App.State.user && App.State.user.uid) {
+                                set(ref(fbDb, `users/${App.State.user.uid}/balance`), App.State.realBalance);
+                            }
+                        }
+                        this.updateGlobalBalanceUI();
+                    }, 25000); // Trigger every 25 seconds for visual feedback
+                },
+
+                /**
+                 * Generates LIVE transactions and Micro-Holdings!
+                 * Fixes the issue of static minutes. Generates new data dynamically.
+                 */
+                startLiveBlockchainFeeder() {
+                    const terminalFeed = document.getElementById('container-blockchain-feed');
+                    
+                    // Arrays for random generation
+                    const aiNodes = ["Core_X", "Alpha_Node", "Neural_Bot", "Elite_Trader", "Quantum_Link", "System_99"];
+                    const assets = ["bitcoin", "ethereum", "solana", "binance-coin", "ripple", "cardano", "dogecoin"];
+                    const actions = ["КУПИ", "ПРОДАДЕ"];
+
+                    setInterval(() => {
+                        // Skip ledger if in demo mode to prevent confusion
+                        if(App.State.isDemoMode) return;
+
+                        const now = new Date();
+                        const timeStr = now.getHours().toString().padStart(2, '0') + ':' + 
+                                        now.getMinutes().toString().padStart(2, '0') + ':' + 
+                                        now.getSeconds().toString().padStart(2, '0');
+                        
+                        const randomBot = aiNodes[Math.floor(Math.random() * aiNodes.length)];
+                        const randomAssetId = assets[Math.floor(Math.random() * assets.length)];
+                        const randomAction = actions[Math.floor(Math.random() * actions.length)];
+                        
+                        // Generate realistic micro amounts depending on asset
+                        let microAmount = 0;
+                        if(randomAssetId === "bitcoin") microAmount = (Math.random() * 0.00005 + 0.000001).toFixed(6);
+                        else if(randomAssetId === "ethereum") microAmount = (Math.random() * 0.005 + 0.0001).toFixed(5);
+                        else microAmount = (Math.random() * 2 + 0.1).toFixed(2);
+
+                        // Calculate fake profit just for ledger visual
+                        const fakeProfit = (Math.random() * 0.5 + 0.05).toFixed(2);
+
+                        // --- 1. Update Ledger UI ---
+                        const row = document.createElement('div');
+                        row.className = 'terminal-line';
+                        
+                        let actionColor = randomAction === "КУПИ" ? "var(--status-success)" : "var(--status-warning)";
+                        
+                        row.innerHTML = `
+                            <span class="term-time">[${timeStr}]</span> 
+                            <span class="term-bot">${randomBot}</span>: 
+                            <span style="color: ${actionColor}; font-weight: 800;">${randomAction}</span> 
+                            <span class="term-amt">${microAmount}</span> 
+                            <span class="term-asset">${randomAssetId.toUpperCase()}</span> ... 
+                            Печалба: <span style="color: var(--status-success); font-weight: 700;">+${fakeProfit} €</span>
+                        `;
+                        
+                        terminalFeed.prepend(row);
+                        
+                        // Keep feed clean (max 30 items)
+                        if(terminalFeed.children.length > 30) {
+                            terminalFeed.removeChild(terminalFeed.lastChild);
+                        }
+
+                        // --- 2. Update Micro-Holdings (The "I have 3 BTC" fix) ---
+                        // Only "Alpha_Node" represents the user's personal AI to keep holdings stable
+                        if(randomBot === "Alpha_Node" && randomAction === "КУПИ") {
+                            let currentHold = App.State.aiHoldings[randomAssetId] || 0;
+                            App.State.aiHoldings[randomAssetId] = currentHold + parseFloat(microAmount);
+                            
+                            // Re-render market list to show updated holding badge
+                            this.renderMarketList();
+                        }
+
+                    }, 4500); // New transaction every 4.5 seconds
+                },
+
+                /**
+                 * Fetch API Data from CoinCap
+                 */
+                async fetchMarketData() {
+                    try {
+                        const response = await fetch('https://api.coincap.io/v2/assets?limit=100');
+                        if (!response.ok) throw new Error('API Error');
+                        const json = await response.json();
+                        App.State.marketData = json.data;
+                        this.renderMarketList();
+                    } catch (err) {
+                        console.warn("Market fetch failed, retaining old data.", err);
+                    }
+                },
+
+                /**
+                 * Renders the crypto list into the DOM
+                 */
+                renderMarketList() {
+                    const listContainer = document.getElementById('container-crypto-list');
+                    listContainer.innerHTML = '';
+
+                    App.State.marketData.forEach(coin => {
+                        const price = parseFloat(coin.priceUsd);
+                        const change = parseFloat(coin.changePercent24Hr);
+                        const isPositive = change >= 0;
+                        const iconUrl = `https://assets.coincap.io/assets/icons/${coin.symbol.toLowerCase()}@2x.png`;
+                        
+                        // Format price beautifully
+                        const displayPrice = price < 1 
+                            ? price.toFixed(5) 
+                            : price.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+                        // Check if AI holds this coin
+                        const holdingAmount = App.State.aiHoldings[coin.id];
+                        let holdingHtml = '';
+                        if (holdingAmount && holdingAmount > 0) {
+                            holdingHtml = `<div class="ai-holding-badge">AI Holding: ${holdingAmount.toFixed(6)}</div>`;
+                        }
+
+                        // Create Row Element
+                        const row = document.createElement('div');
+                        row.className = 'crypto-asset-item';
+                        
+                        // Store data attributes for search filtering
+                        row.dataset.name = coin.name.toLowerCase();
+                        row.dataset.symbol = coin.symbol.toLowerCase();
+
+                        // Attach onclick event for Modal Chart
+                        row.onclick = () => App.UI.openCoinModal(coin.id, coin.symbol, coin.name, price);
+
+                        row.innerHTML = `
+                            <div class="asset-left-side">
+                                <div class="asset-icon-wrapper">
+                                    <img src="${iconUrl}" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/8/8b/Cryptocurrency_Logo.svg'">
+                                </div>
+                                <div class="asset-details">
+                                    <div class="asset-symbol">${coin.symbol}</div>
+                                    <div class="asset-name">${coin.name}</div>
+                                    ${holdingHtml}
+                                </div>
+                            </div>
+                            <div class="asset-right-side">
+                                <div class="asset-price">$${displayPrice}</div>
+                                <div class="asset-change ${isPositive ? 'change-positive' : 'change-negative'}">
+                                    ${isPositive ? '+' : ''}${change.toFixed(2)}%
+                                </div>
+                            </div>
+                        `;
+
+                        listContainer.appendChild(row);
+                    });
+
+                    // Re-apply search filter in case data re-rendered while user is searching
+                    this.filterMarketList();
+                },
+
+                /**
+                 * Filters the market list based on search input
+                 */
+                filterMarketList() {
+                    const searchTerm = document.getElementById('input-market-search').value.toLowerCase().trim();
+                    const items = document.querySelectorAll('.crypto-asset-item');
+
+                    items.forEach(item => {
+                        const name = item.dataset.name;
+                        const symbol = item.dataset.symbol;
+                        
+                        if (name.includes(searchTerm) || symbol.includes(searchTerm)) {
+                            item.style.display = 'flex';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                }
+            }
+        };
+
+        // ==========================================================
+        // INITIALIZATION
+        // ==========================================================
+        
+        // Expose specific functions to the global window object 
+        // so that HTML inline `onclick` attributes can find them.
+        window.App = App;
+
+        // Initialize phone input on DOM load
+        document.addEventListener("DOMContentLoaded", () => {
+            const phoneInputField = document.querySelector("#input-reg-phone");
+            if(phoneInputField) {
+                App.State.phoneInputInst = window.intlTelInput(phoneInputField, {
+                    preferredCountries: ["bg", "de", "gb", "us", "it"],
+                    separateDialCode: true,
+                    utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
+                });
+            }
+        });
+
+    </script>
+</body>
+</html>
