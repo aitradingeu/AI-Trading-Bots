@@ -10,23 +10,23 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 /* ==========================================================================
-1. CSS VARIABLES, RESET & THEMES (CYBERPUNK PURPLE & CYAN STYLE)
+1. CSS VARIABLES, RESET & THEMES (ONECOIN STYLE: DARK BLUE & GOLD)
 ========================================================================== */
 :root {
---brand-primary: #00f2ff; /* Cyan */
---brand-primary-hover: #7000ff; /* Purple */
---brand-dark: #0a0118;
---bg-main: #0f0224;
---bg-card: rgba(20, 5, 45, 0.7);
+--brand-primary: #d4af37;
+--brand-primary-hover: #ffdf00;
+--brand-dark: #000b18;
+--bg-main: #001224;
+--bg-card: rgba(0, 31, 63, 0.7);
 --text-main: #ffffff;
---text-muted: #b0a4d0;
+--text-muted: #8da3b8;
 --success: #00ff88;
---danger: #ff0055;
+--danger: #ff3b30;
 --warning: #ffcc00;
---border-light: rgba(112, 0, 255, 0.2);
---shadow-sm: 0 4px 15px rgba(0,0,0,0.5);
---shadow-md: 0 8px 30px rgba(10, 1, 24, 0.9);
---shadow-lg: 0 0 20px rgba(112, 0, 255, 0.3);
+--border-light: rgba(212, 175, 55, 0.2);
+--shadow-sm: 0 4px 15px rgba(0,0,0,0.3);
+--shadow-md: 0 8px 30px rgba(0, 11, 24, 0.8);
+--shadow-lg: 0 0 20px rgba(212, 175, 55, 0.2);
 --radius-md: 16px;
 --radius-lg: 24px;
 --radius-xl: 32px;
@@ -37,7 +37,7 @@
 
 body {
 font-family: 'Inter', sans-serif;
-background: radial-gradient(circle at top, #1a053d 0%, #0a0118 100%);
+background: radial-gradient(circle at top, #001a33 0%, #000b18 100%);
 color: var(--text-main);
 -webkit-tap-highlight-color: transparent;
 line-height: 1.5;
@@ -60,6 +60,7 @@ min-height: 100vh;
 .ticker { display: flex; white-space: nowrap; animation: ticker 30s linear infinite; font-size: 13px; font-weight: 700; color: var(--text-main); }
 @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
 
+/* 
             /* ==========================================================================
            2. AUTHENTICATION MODULE
            ========================================================================== */
